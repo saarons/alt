@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Alt::VERSION
   s.authors     = ["Sam Aarons"]
   s.email       = ["samaarons@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "http://www.alt-lang.org"
   s.summary     = %q{TODO: Write a gem summary}
   s.description = %q{TODO: Write a gem description}
 
@@ -18,7 +18,5 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  # specify any dependencies here; for example:
-  # s.add_development_dependency "rspec"
-  # s.add_runtime_dependency "rest-client"
+  s.add_runtime_dependency "kpeg"
 end
