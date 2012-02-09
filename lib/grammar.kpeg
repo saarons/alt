@@ -8,20 +8,23 @@ char = /[A-Za-z]/
 digit = /[0-9]/
 terminator = "\n"
 
+number = < digit+ > { text }
+identifier = < char+ > { text }
+
 %% ast-location = ::Alt::AST
 %% assign = ast Assignment(name, expression)
+%% number_literal = ast NumberLiteral(number)
 
 root = expressions:e { @ast = e }
 
-expressions = expression
-            | expressions terminator expression
-            | expressions terminator
+expressions = expression:e { [e] }
+            | expressions:es terminator expression:e { es << e }
+            | expressions:es terminator { es }
             | terminator
             
 expression = literal
            | assign
            
-literal = digit*
-        | char*
-        
+literal = number:n ~number_literal(n)
+
 assign = identifier:i space* "=" space* expression:e ~assign(i,e)

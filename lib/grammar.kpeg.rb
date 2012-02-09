@@ -17,9 +17,18 @@ class Alt::Parser < KPeg::CompiledParser
       attr_reader :name
       attr_reader :expression
     end
+    class NumberLiteral < Node
+      def initialize(number)
+        @number = number
+      end
+      attr_reader :number
+    end
   end
   def assign(name, expression)
     ::Alt::AST::Assignment.new(name, expression)
+  end
+  def number_literal(number)
+    ::Alt::AST::NumberLiteral.new(number)
   end
 
   # space = " "
@@ -50,6 +59,78 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
+  # number = < digit+ > { text }
+  def _number
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+      _save1 = self.pos
+      _tmp = apply(:_digit)
+      if _tmp
+        while true
+          _tmp = apply(:_digit)
+          break unless _tmp
+        end
+        _tmp = true
+      else
+        self.pos = _save1
+      end
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  text ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_number unless _tmp
+    return _tmp
+  end
+
+  # identifier = < char+ > { text }
+  def _identifier
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+      _save1 = self.pos
+      _tmp = apply(:_char)
+      if _tmp
+        while true
+          _tmp = apply(:_char)
+          break unless _tmp
+        end
+        _tmp = true
+      else
+        self.pos = _save1
+      end
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  text ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_identifier unless _tmp
+    return _tmp
+  end
+
   # root = expressions:e { @ast = e }
   def _root
 
@@ -73,28 +154,22 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # expressions = (expression | expressions terminator expression | expressions terminator | terminator)
+  # expressions = (expression:e { [e] } | expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | terminator)
   def _expressions
 
     _save = self.pos
     while true # choice
-      _tmp = apply(:_expression)
-      break if _tmp
-      self.pos = _save
 
       _save1 = self.pos
       while true # sequence
-        _tmp = apply(:_expressions)
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply(:_terminator)
-        unless _tmp
-          self.pos = _save1
-          break
-        end
         _tmp = apply(:_expression)
+        e = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        @result = begin;  [e] ; end
+        _tmp = true
         unless _tmp
           self.pos = _save1
         end
@@ -107,6 +182,7 @@ class Alt::Parser < KPeg::CompiledParser
       _save2 = self.pos
       while true # sequence
         _tmp = apply(:_expressions)
+        es = @result
         unless _tmp
           self.pos = _save2
           break
@@ -114,6 +190,42 @@ class Alt::Parser < KPeg::CompiledParser
         _tmp = apply(:_terminator)
         unless _tmp
           self.pos = _save2
+          break
+        end
+        _tmp = apply(:_expression)
+        e = @result
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        @result = begin;  es << e ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+        end
+        break
+      end # end sequence
+
+      break if _tmp
+      self.pos = _save
+
+      _save3 = self.pos
+      while true # sequence
+        _tmp = apply(:_expressions)
+        es = @result
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        _tmp = apply(:_terminator)
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        @result = begin;  es ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save3
         end
         break
       end # end sequence
@@ -148,27 +260,24 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # literal = (digit* | char*)
+  # literal = number:n {number_literal(n)}
   def _literal
 
     _save = self.pos
-    while true # choice
-      while true
-        _tmp = apply(:_digit)
-        break unless _tmp
+    while true # sequence
+      _tmp = apply(:_number)
+      n = @result
+      unless _tmp
+        self.pos = _save
+        break
       end
+      @result = begin; number_literal(n); end
       _tmp = true
-      break if _tmp
-      self.pos = _save
-      while true
-        _tmp = apply(:_char)
-        break unless _tmp
+      unless _tmp
+        self.pos = _save
       end
-      _tmp = true
-      break if _tmp
-      self.pos = _save
       break
-    end # end choice
+    end # end sequence
 
     set_failed_rule :_literal unless _tmp
     return _tmp
@@ -231,9 +340,11 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_char] = rule_info("char", "/[A-Za-z]/")
   Rules[:_digit] = rule_info("digit", "/[0-9]/")
   Rules[:_terminator] = rule_info("terminator", "\"\\n\"")
+  Rules[:_number] = rule_info("number", "< digit+ > { text }")
+  Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
   Rules[:_root] = rule_info("root", "expressions:e { @ast = e }")
-  Rules[:_expressions] = rule_info("expressions", "(expression | expressions terminator expression | expressions terminator | terminator)")
+  Rules[:_expressions] = rule_info("expressions", "(expression:e { [e] } | expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | terminator)")
   Rules[:_expression] = rule_info("expression", "(literal | assign)")
-  Rules[:_literal] = rule_info("literal", "(digit* | char*)")
+  Rules[:_literal] = rule_info("literal", "number:n {number_literal(n)}")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
 end
