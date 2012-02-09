@@ -7,6 +7,23 @@
 %% false_literal = ast FalseLiteral
 %% nil_literal = ast NilLiteral
 
+%% {
+def shunting_yard(input)
+  [].tap do |rpn|
+    operator_stack = []
+    input.each do |object|
+      if op1 = ::Alt::PrecedenceTable.lookup(object)
+        rpn << operator_stack.pop while (op2 = operator_stack.last) && (op1.left_associative? ? op1.precedence <= op2.precedence : op1.precedence < op2.precedence)
+        operator_stack << op1
+      else
+        rpn << object
+      end
+    end
+    rpn << operator_stack.pop until operator_stack.empty?
+  end
+end
+}
+
 space = " "
 char = /[A-Za-z]/
 digit = /[0-9]/
@@ -17,8 +34,19 @@ terminator = newline (space | newline)*
 number = < digit+ > { text }
 identifier = < char+ > { text }
 
-operator_chars = /[~`!@#$\%^\&*\\+\-\/?:<=>\|]/
-binary_operator = < operator_chars+ > { text }
+operators = "||"
+          | "&&"
+          | "=="
+          | "!="
+          | "<"
+          | "<="
+          | ">"
+          | ">="
+          | "+"
+          | "-"
+          | "*"
+          | "/"
+          | "^"
 
 root = expressions
 
@@ -27,7 +55,8 @@ expressions = expressions:es terminator expression:e { es << e }
             | expression:e { [e] }
             | terminator
             
-expression = assign
+expression = binary_send
+           | assign
            | call
            | literal
            | "(" expression:e ")" { e }
@@ -49,3 +78,6 @@ arg_list = expression
          | arg_list:al "," expression:e { Array(al) << e }
 
 assign = identifier:i space* "=" space* expression:e ~assign(i,e)
+
+binary_c = literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p).tap {|x| puts x.inspect} }
+binary_send = binary_c:c { shunting_yard(c) }

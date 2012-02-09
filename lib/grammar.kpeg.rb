@@ -2,6 +2,24 @@ require 'kpeg/compiled_parser'
 
 class Alt::Parser < KPeg::CompiledParser
 
+
+def shunting_yard(input)
+  [].tap do |rpn|
+    operator_stack = []
+    input.each do |object|
+      if op1 = ::Alt::PrecedenceTable.lookup(object)
+        rpn << operator_stack.pop while (op2 = operator_stack.last) && (op1.left_associative? ? op1.precedence <= op2.precedence : op1.precedence < op2.precedence)
+        operator_stack << op1
+      else
+        rpn << object
+      end
+    end
+    rpn << operator_stack.pop until operator_stack.empty?
+  end
+end
+
+
+
   module ::Alt::AST
     class Node; end
     class Assignment < Node
@@ -196,46 +214,54 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # operator_chars = /[~`!@#$\%^\&*\\+\-\/?:<=>\|]/
-  def _operator_chars
-    _tmp = scan(/\A(?-mix:[~`!@#$\%^\&*\\+\-\/?:<=>\|])/)
-    set_failed_rule :_operator_chars unless _tmp
-    return _tmp
-  end
-
-  # binary_operator = < operator_chars+ > { text }
-  def _binary_operator
+  # operators = ("||" | "&&" | "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/" | "^")
+  def _operators
 
     _save = self.pos
-    while true # sequence
-      _text_start = self.pos
-      _save1 = self.pos
-      _tmp = apply(:_operator_chars)
-      if _tmp
-        while true
-          _tmp = apply(:_operator_chars)
-          break unless _tmp
-        end
-        _tmp = true
-      else
-        self.pos = _save1
-      end
-      if _tmp
-        text = get_text(_text_start)
-      end
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      @result = begin;  text ; end
-      _tmp = true
-      unless _tmp
-        self.pos = _save
-      end
+    while true # choice
+      _tmp = match_string("||")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("&&")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("==")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("!=")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("<")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("<=")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string(">")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string(">=")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("+")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("-")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("*")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("/")
+      break if _tmp
+      self.pos = _save
+      _tmp = match_string("^")
+      break if _tmp
+      self.pos = _save
       break
-    end # end sequence
+    end # end choice
 
-    set_failed_rule :_binary_operator unless _tmp
+    set_failed_rule :_operators unless _tmp
     return _tmp
   end
 
@@ -334,11 +360,14 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # expression = (assign | call | literal | "(" expression:e ")" { e })
+  # expression = (binary_send | assign | call | literal | "(" expression:e ")" { e })
   def _expression
 
     _save = self.pos
     while true # choice
+      _tmp = apply(:_binary_send)
+      break if _tmp
+      self.pos = _save
       _tmp = apply(:_assign)
       break if _tmp
       self.pos = _save
@@ -784,6 +813,158 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
+  # binary_c = literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p).tap {|x| puts x.inspect} }
+  def _binary_c
+
+    _save = self.pos
+    while true # sequence
+      _tmp = apply(:_literal)
+      p = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _save1 = self.pos
+      _ary = []
+
+      _save2 = self.pos
+      while true # sequence
+        while true
+          _tmp = apply(:_space)
+          break unless _tmp
+        end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        _text_start = self.pos
+        _tmp = apply(:_operators)
+        if _tmp
+          text = get_text(_text_start)
+        end
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        while true
+          _tmp = apply(:_space)
+          break unless _tmp
+        end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        _tmp = apply(:_literal)
+        e = @result
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        @result = begin;  [text, e] ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+        end
+        break
+      end # end sequence
+
+      if _tmp
+        _ary << @result
+        while true
+
+          _save5 = self.pos
+          while true # sequence
+            while true
+              _tmp = apply(:_space)
+              break unless _tmp
+            end
+            _tmp = true
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            _text_start = self.pos
+            _tmp = apply(:_operators)
+            if _tmp
+              text = get_text(_text_start)
+            end
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            while true
+              _tmp = apply(:_space)
+              break unless _tmp
+            end
+            _tmp = true
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            _tmp = apply(:_literal)
+            e = @result
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            @result = begin;  [text, e] ; end
+            _tmp = true
+            unless _tmp
+              self.pos = _save5
+            end
+            break
+          end # end sequence
+
+          _ary << @result if _tmp
+          break unless _tmp
+        end
+        _tmp = true
+        @result = _ary
+      else
+        self.pos = _save1
+      end
+      bs = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  bs.flatten.unshift(p).tap {|x| puts x.inspect} ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_binary_c unless _tmp
+    return _tmp
+  end
+
+  # binary_send = binary_c:c { shunting_yard(c) }
+  def _binary_send
+
+    _save = self.pos
+    while true # sequence
+      _tmp = apply(:_binary_c)
+      c = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  shunting_yard(c) ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_binary_send unless _tmp
+    return _tmp
+  end
+
   Rules = {}
   Rules[:_space] = rule_info("space", "\" \"")
   Rules[:_char] = rule_info("char", "/[A-Za-z]/")
@@ -792,13 +973,14 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_terminator] = rule_info("terminator", "newline (space | newline)*")
   Rules[:_number] = rule_info("number", "< digit+ > { text }")
   Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
-  Rules[:_operator_chars] = rule_info("operator_chars", "/[~`!@\#$\\%^\\&*\\\\+\\-\\/?:<=>\\|]/")
-  Rules[:_binary_operator] = rule_info("binary_operator", "< operator_chars+ > { text }")
+  Rules[:_operators] = rule_info("operators", "(\"||\" | \"&&\" | \"==\" | \"!=\" | \"<\" | \"<=\" | \">\" | \">=\" | \"+\" | \"-\" | \"*\" | \"/\" | \"^\")")
   Rules[:_root] = rule_info("root", "expressions")
   Rules[:_expressions] = rule_info("expressions", "(expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | expression:e { [e] } | terminator)")
-  Rules[:_expression] = rule_info("expression", "(assign | call | literal | \"(\" expression:e \")\" { e })")
+  Rules[:_expression] = rule_info("expression", "(binary_send | assign | call | literal | \"(\" expression:e \")\" { e })")
   Rules[:_literal] = rule_info("literal", "(number:n {number_literal(n)} | \"true\" {true_literal} | \"false\" {false_literal} | \"nil\" {nil_literal})")
   Rules[:_call] = rule_info("call", "(literal:l \".\" identifier:i \"(\" arg_list:al \")\" {method_call(l, i, Array(al))} | literal:l \".\" identifier:i {method_call(l, i, [])} | expression:e \".\" identifier:i \"(\" arg_list:al \")\" {method_call(e, i, Array(al))} | expression:e \".\" identifier:i {method_call(e, i, [])} | identifier:i \"(\" arg_list:al \")\" {method_call(nil, i, Array(al))} | identifier:i {method_call(nil, i, [])})")
   Rules[:_arg_list] = rule_info("arg_list", "(expression | arg_list:al \",\" expression:e { Array(al) << e })")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
+  Rules[:_binary_c] = rule_info("binary_c", "literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p).tap {|x| puts x.inspect} }")
+  Rules[:_binary_send] = rule_info("binary_send", "binary_c:c { shunting_yard(c) }")
 end
