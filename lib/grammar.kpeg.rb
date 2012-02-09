@@ -2,6 +2,36 @@ require 'kpeg/compiled_parser'
 
 class Alt::Parser < KPeg::CompiledParser
 
+
+  PRECEDENCE = {"*"   => 5,
+                "/"   => 5,
+                "+"   => 6,
+                "-"   => 6,
+                "^"   => 7,
+                "<"   => 8,
+                "<="  => 8,
+                ">"   => 8,
+                ">="  => 8,
+                "=="  => 9,
+                "!="  => 9,
+                "<=>" => 10,
+                "&&"  => 13,
+                "||"  => 14}.freeze
+                
+  def resolve(a, e, chain)
+    return [e, []] if chain.empty?
+    b, *rest = chain
+    if a && (PRECEDENCE[a] > PRECEDENCE[b] || (PRECEDENCE[a] == PRECEDENCE[b]))
+      [e, chain]
+    else
+      e2, *rest2 = rest
+      r, rest3 = resolve(b, e2, rest2)
+      resolve(a, method_call(e, b, r), rest3)
+    end
+  end
+
+
+
   module ::Alt::AST
     class Node; end
     class Assignment < Node
@@ -196,6 +226,49 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
+  # operator_chars = /[~`!@#$\%^\&*\\+\-\/?:<=>\|]/
+  def _operator_chars
+    _tmp = scan(/\A(?-mix:[~`!@#$\%^\&*\\+\-\/?:<=>\|])/)
+    set_failed_rule :_operator_chars unless _tmp
+    return _tmp
+  end
+
+  # binary_operator = < operator_chars+ > { text }
+  def _binary_operator
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+      _save1 = self.pos
+      _tmp = apply(:_operator_chars)
+      if _tmp
+        while true
+          _tmp = apply(:_operator_chars)
+          break unless _tmp
+        end
+        _tmp = true
+      else
+        self.pos = _save1
+      end
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  text ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_binary_operator unless _tmp
+    return _tmp
+  end
+
   # root = expressions
   def _root
     _tmp = apply(:_expressions)
@@ -291,7 +364,7 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # expression = (assign | call | literal | "(" expression:e ")" { e })
+  # expression = (assign | operator | secondary_expression)
   def _expression
 
     _save = self.pos
@@ -299,6 +372,24 @@ class Alt::Parser < KPeg::CompiledParser
       _tmp = apply(:_assign)
       break if _tmp
       self.pos = _save
+      _tmp = apply(:_operator)
+      break if _tmp
+      self.pos = _save
+      _tmp = apply(:_secondary_expression)
+      break if _tmp
+      self.pos = _save
+      break
+    end # end choice
+
+    set_failed_rule :_expression unless _tmp
+    return _tmp
+  end
+
+  # secondary_expression = (call | literal | "(" expression:e ")" { e })
+  def _secondary_expression
+
+    _save = self.pos
+    while true # choice
       _tmp = apply(:_call)
       break if _tmp
       self.pos = _save
@@ -337,7 +428,7 @@ class Alt::Parser < KPeg::CompiledParser
       break
     end # end choice
 
-    set_failed_rule :_expression unless _tmp
+    set_failed_rule :_secondary_expression unless _tmp
     return _tmp
   end
 
@@ -426,7 +517,7 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # call = (literal:l "." identifier:i {method_call(l, i, [])} | literal:l "." identifier:i "(" arg_list:al ")" {method_call(l, i, Array(al))} | identifier:i {method_call(nil, i, [])} | identifier:i "(" arg_list:al ")" {method_call(nil, i, Array(al))} | expression:e "." identifier:i {method_call(e, i, [])} | expression:e "." identifier:i "(" arg_list:al ")" {method_call(e, i, Array(al))})
+  # call = (literal:l "." identifier:i {method_call(l, i, [])} | literal:l "." identifier:i "(" arg_list:al ")" {method_call(l, i, Array(al))} | expression:e "." identifier:i {method_call(e, i, [])} | expression:e "." identifier:i "(" arg_list:al ")" {method_call(e, i, Array(al))} | identifier:i {method_call(nil, i, [])} | identifier:i "(" arg_list:al ")" {method_call(nil, i, Array(al))})
   def _call
 
     _save = self.pos
@@ -510,13 +601,24 @@ class Alt::Parser < KPeg::CompiledParser
 
       _save3 = self.pos
       while true # sequence
+        _tmp = apply(:_expression)
+        e = @result
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        _tmp = match_string(".")
+        unless _tmp
+          self.pos = _save3
+          break
+        end
         _tmp = apply(:_identifier)
         i = @result
         unless _tmp
           self.pos = _save3
           break
         end
-        @result = begin; method_call(nil, i, []); end
+        @result = begin; method_call(e, i, []); end
         _tmp = true
         unless _tmp
           self.pos = _save3
@@ -529,6 +631,17 @@ class Alt::Parser < KPeg::CompiledParser
 
       _save4 = self.pos
       while true # sequence
+        _tmp = apply(:_expression)
+        e = @result
+        unless _tmp
+          self.pos = _save4
+          break
+        end
+        _tmp = match_string(".")
+        unless _tmp
+          self.pos = _save4
+          break
+        end
         _tmp = apply(:_identifier)
         i = @result
         unless _tmp
@@ -551,7 +664,7 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save4
           break
         end
-        @result = begin; method_call(nil, i, Array(al)); end
+        @result = begin; method_call(e, i, Array(al)); end
         _tmp = true
         unless _tmp
           self.pos = _save4
@@ -564,24 +677,13 @@ class Alt::Parser < KPeg::CompiledParser
 
       _save5 = self.pos
       while true # sequence
-        _tmp = apply(:_expression)
-        e = @result
-        unless _tmp
-          self.pos = _save5
-          break
-        end
-        _tmp = match_string(".")
-        unless _tmp
-          self.pos = _save5
-          break
-        end
         _tmp = apply(:_identifier)
         i = @result
         unless _tmp
           self.pos = _save5
           break
         end
-        @result = begin; method_call(e, i, []); end
+        @result = begin; method_call(nil, i, []); end
         _tmp = true
         unless _tmp
           self.pos = _save5
@@ -594,17 +696,6 @@ class Alt::Parser < KPeg::CompiledParser
 
       _save6 = self.pos
       while true # sequence
-        _tmp = apply(:_expression)
-        e = @result
-        unless _tmp
-          self.pos = _save6
-          break
-        end
-        _tmp = match_string(".")
-        unless _tmp
-          self.pos = _save6
-          break
-        end
         _tmp = apply(:_identifier)
         i = @result
         unless _tmp
@@ -627,7 +718,7 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save6
           break
         end
-        @result = begin; method_call(e, i, Array(al)); end
+        @result = begin; method_call(nil, i, Array(al)); end
         _tmp = true
         unless _tmp
           self.pos = _save6
@@ -741,6 +832,152 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
+  # operator = secondary_expression:se operator_chain:oc { resolve(nil, se, oc).first }
+  def _operator
+
+    _save = self.pos
+    while true # sequence
+      _tmp = apply(:_secondary_expression)
+      se = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _tmp = apply(:_operator_chain)
+      oc = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  resolve(nil, se, oc).first ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_operator unless _tmp
+    return _tmp
+  end
+
+  # operator_chain = (space* binary_operator:o space* secondary_expression:se { [o, se] })+:oc { oc.flatten }
+  def _operator_chain
+
+    _save = self.pos
+    while true # sequence
+      _save1 = self.pos
+      _ary = []
+
+      _save2 = self.pos
+      while true # sequence
+        while true
+          _tmp = apply(:_space)
+          break unless _tmp
+        end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        _tmp = apply(:_binary_operator)
+        o = @result
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        while true
+          _tmp = apply(:_space)
+          break unless _tmp
+        end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        _tmp = apply(:_secondary_expression)
+        se = @result
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        @result = begin;  [o, se] ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+        end
+        break
+      end # end sequence
+
+      if _tmp
+        _ary << @result
+        while true
+
+          _save5 = self.pos
+          while true # sequence
+            while true
+              _tmp = apply(:_space)
+              break unless _tmp
+            end
+            _tmp = true
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            _tmp = apply(:_binary_operator)
+            o = @result
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            while true
+              _tmp = apply(:_space)
+              break unless _tmp
+            end
+            _tmp = true
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            _tmp = apply(:_secondary_expression)
+            se = @result
+            unless _tmp
+              self.pos = _save5
+              break
+            end
+            @result = begin;  [o, se] ; end
+            _tmp = true
+            unless _tmp
+              self.pos = _save5
+            end
+            break
+          end # end sequence
+
+          _ary << @result if _tmp
+          break unless _tmp
+        end
+        _tmp = true
+        @result = _ary
+      else
+        self.pos = _save1
+      end
+      oc = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  oc.flatten ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_operator_chain unless _tmp
+    return _tmp
+  end
+
   Rules = {}
   Rules[:_space] = rule_info("space", "\" \"")
   Rules[:_char] = rule_info("char", "/[A-Za-z]/")
@@ -749,11 +986,16 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_terminator] = rule_info("terminator", "newline (space | newline)*")
   Rules[:_number] = rule_info("number", "< digit+ > { text }")
   Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
+  Rules[:_operator_chars] = rule_info("operator_chars", "/[~`!@\#$\\%^\\&*\\\\+\\-\\/?:<=>\\|]/")
+  Rules[:_binary_operator] = rule_info("binary_operator", "< operator_chars+ > { text }")
   Rules[:_root] = rule_info("root", "expressions")
   Rules[:_expressions] = rule_info("expressions", "(expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | expression:e { [e] } | terminator)")
-  Rules[:_expression] = rule_info("expression", "(assign | call | literal | \"(\" expression:e \")\" { e })")
+  Rules[:_expression] = rule_info("expression", "(assign | operator | secondary_expression)")
+  Rules[:_secondary_expression] = rule_info("secondary_expression", "(call | literal | \"(\" expression:e \")\" { e })")
   Rules[:_literal] = rule_info("literal", "(number:n {number_literal(n)} | \"true\" {true_literal} | \"false\" {false_literal} | \"nil\" {nil_literal})")
-  Rules[:_call] = rule_info("call", "(literal:l \".\" identifier:i {method_call(l, i, [])} | literal:l \".\" identifier:i \"(\" arg_list:al \")\" {method_call(l, i, Array(al))} | identifier:i {method_call(nil, i, [])} | identifier:i \"(\" arg_list:al \")\" {method_call(nil, i, Array(al))} | expression:e \".\" identifier:i {method_call(e, i, [])} | expression:e \".\" identifier:i \"(\" arg_list:al \")\" {method_call(e, i, Array(al))})")
+  Rules[:_call] = rule_info("call", "(literal:l \".\" identifier:i {method_call(l, i, [])} | literal:l \".\" identifier:i \"(\" arg_list:al \")\" {method_call(l, i, Array(al))} | expression:e \".\" identifier:i {method_call(e, i, [])} | expression:e \".\" identifier:i \"(\" arg_list:al \")\" {method_call(e, i, Array(al))} | identifier:i {method_call(nil, i, [])} | identifier:i \"(\" arg_list:al \")\" {method_call(nil, i, Array(al))})")
   Rules[:_arg_list] = rule_info("arg_list", "(expression | arg_list:al \",\" expression:e { Array(al) << e })")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
+  Rules[:_operator] = rule_info("operator", "secondary_expression:se operator_chain:oc { resolve(nil, se, oc).first }")
+  Rules[:_operator_chain] = rule_info("operator_chain", "(space* binary_operator:o space* secondary_expression:se { [o, se] })+:oc { oc.flatten }")
 end
