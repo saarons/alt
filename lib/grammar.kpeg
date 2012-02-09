@@ -18,9 +18,9 @@ identifier = < char+ > { text }
 
 root = expressions
 
-expressions = expression:e { [e] }
-            | expressions:es terminator expression:e { es << e }
+expressions = expressions:es terminator expression:e { es << e }
             | expressions:es terminator { es }
+            | expression:e { [e] }
             | terminator
             
 expression = literal

@@ -190,7 +190,7 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # expressions = (expression:e { [e] } | expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | terminator)
+  # expressions = (expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | expression:e { [e] } | terminator)
   def _expressions
 
     _save = self.pos
@@ -198,13 +198,24 @@ class Alt::Parser < KPeg::CompiledParser
 
       _save1 = self.pos
       while true # sequence
+        _tmp = apply(:_expressions)
+        es = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_terminator)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
         _tmp = apply(:_expression)
         e = @result
         unless _tmp
           self.pos = _save1
           break
         end
-        @result = begin;  [e] ; end
+        @result = begin;  es << e ; end
         _tmp = true
         unless _tmp
           self.pos = _save1
@@ -228,13 +239,7 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save2
           break
         end
-        _tmp = apply(:_expression)
-        e = @result
-        unless _tmp
-          self.pos = _save2
-          break
-        end
-        @result = begin;  es << e ; end
+        @result = begin;  es ; end
         _tmp = true
         unless _tmp
           self.pos = _save2
@@ -247,18 +252,13 @@ class Alt::Parser < KPeg::CompiledParser
 
       _save3 = self.pos
       while true # sequence
-        _tmp = apply(:_expressions)
-        es = @result
+        _tmp = apply(:_expression)
+        e = @result
         unless _tmp
           self.pos = _save3
           break
         end
-        _tmp = apply(:_terminator)
-        unless _tmp
-          self.pos = _save3
-          break
-        end
-        @result = begin;  es ; end
+        @result = begin;  [e] ; end
         _tmp = true
         unless _tmp
           self.pos = _save3
@@ -471,7 +471,7 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_number] = rule_info("number", "< digit+ > { text }")
   Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
   Rules[:_root] = rule_info("root", "expressions")
-  Rules[:_expressions] = rule_info("expressions", "(expression:e { [e] } | expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | terminator)")
+  Rules[:_expressions] = rule_info("expressions", "(expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | expression:e { [e] } | terminator)")
   Rules[:_expression] = rule_info("expression", "(literal | assign | \"(\" expression:e \")\" { e })")
   Rules[:_literal] = rule_info("literal", "(number:n {number_literal(n)} | \"true\" {true_literal} | \"false\" {false_literal} | \"nil\" {nil_literal})")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
