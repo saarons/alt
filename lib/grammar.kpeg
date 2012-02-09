@@ -44,7 +44,7 @@ digit = /[0-9]/
 newline = "\n"
 terminator = newline (space | newline)*
 
-number = < digit+ > { text }
+number = < digit+ ("." digit+)? > { text }
 identifier = < char+ > { text }
 
 operators = "||"
