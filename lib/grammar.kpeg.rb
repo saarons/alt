@@ -12,18 +12,39 @@ class Alt::Parser < KPeg::CompiledParser
       attr_reader :name
       attr_reader :expression
     end
+    class FalseLiteral < Node
+      def initialize()
+      end
+    end
+    class NilLiteral < Node
+      def initialize()
+      end
+    end
     class NumberLiteral < Node
       def initialize(number)
         @number = number
       end
       attr_reader :number
     end
+    class TrueLiteral < Node
+      def initialize()
+      end
+    end
   end
   def assign(name, expression)
     ::Alt::AST::Assignment.new(name, expression)
   end
+  def false_literal()
+    ::Alt::AST::FalseLiteral.new()
+  end
+  def nil_literal()
+    ::Alt::AST::NilLiteral.new()
+  end
   def number_literal(number)
     ::Alt::AST::NumberLiteral.new(number)
+  end
+  def true_literal()
+    ::Alt::AST::TrueLiteral.new()
   end
 
   # space = " "
@@ -221,7 +242,7 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # expression = (literal | assign)
+  # expression = (literal | assign | "(" expression:e ")" { e })
   def _expression
 
     _save = self.pos
@@ -232,6 +253,35 @@ class Alt::Parser < KPeg::CompiledParser
       _tmp = apply(:_assign)
       break if _tmp
       self.pos = _save
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = match_string("(")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_expression)
+        e = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = match_string(")")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        @result = begin;  e ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save1
+        end
+        break
+      end # end sequence
+
+      break if _tmp
+      self.pos = _save
       break
     end # end choice
 
@@ -239,24 +289,86 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # literal = number:n {number_literal(n)}
+  # literal = (number:n {number_literal(n)} | "true" {true_literal} | "false" {false_literal} | "nil" {nil_literal})
   def _literal
 
     _save = self.pos
-    while true # sequence
-      _tmp = apply(:_number)
-      n = @result
-      unless _tmp
-        self.pos = _save
+    while true # choice
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = apply(:_number)
+        n = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        @result = begin; number_literal(n); end
+        _tmp = true
+        unless _tmp
+          self.pos = _save1
+        end
         break
-      end
-      @result = begin; number_literal(n); end
-      _tmp = true
-      unless _tmp
-        self.pos = _save
-      end
+      end # end sequence
+
+      break if _tmp
+      self.pos = _save
+
+      _save2 = self.pos
+      while true # sequence
+        _tmp = match_string("true")
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        @result = begin; true_literal; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+        end
+        break
+      end # end sequence
+
+      break if _tmp
+      self.pos = _save
+
+      _save3 = self.pos
+      while true # sequence
+        _tmp = match_string("false")
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        @result = begin; false_literal; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save3
+        end
+        break
+      end # end sequence
+
+      break if _tmp
+      self.pos = _save
+
+      _save4 = self.pos
+      while true # sequence
+        _tmp = match_string("nil")
+        unless _tmp
+          self.pos = _save4
+          break
+        end
+        @result = begin; nil_literal; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save4
+        end
+        break
+      end # end sequence
+
+      break if _tmp
+      self.pos = _save
       break
-    end # end sequence
+    end # end choice
 
     set_failed_rule :_literal unless _tmp
     return _tmp
@@ -323,7 +435,7 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
   Rules[:_root] = rule_info("root", "expressions")
   Rules[:_expressions] = rule_info("expressions", "(expression:e { [e] } | expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | terminator)")
-  Rules[:_expression] = rule_info("expression", "(literal | assign)")
-  Rules[:_literal] = rule_info("literal", "number:n {number_literal(n)}")
+  Rules[:_expression] = rule_info("expression", "(literal | assign | \"(\" expression:e \")\" { e })")
+  Rules[:_literal] = rule_info("literal", "(number:n {number_literal(n)} | \"true\" {true_literal} | \"false\" {false_literal} | \"nil\" {nil_literal})")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
 end
