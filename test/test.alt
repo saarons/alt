@@ -1,2 +1,2 @@
 a = 4.567
-a.property.call(5)
+a.bob && a

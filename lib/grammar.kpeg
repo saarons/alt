@@ -68,7 +68,7 @@ expressions = expressions:es terminator expression:e { es << e }
             | expression:e { [e] }
             | terminator
             
-expression = binary_send
+expression = call
            | assign
            | literal
            | "(" expression:e ")" { e }
@@ -77,23 +77,15 @@ literal = number:n ~number_literal(n)
         | "true" ~true_literal
         | "false" ~false_literal
         | "nil" ~nil_literal
-        
-call = literal:l "." identifier:i "(" arg_list:al ")" ~method_call(l, i, al)
-     | literal:l "." identifier:i ~method_call(l, i, [])
-     | expression:e "." identifier:i "(" arg_list:al ")" ~method_call(e, i, al)
-     | expression:e "." identifier:i ~method_call(e, i, [])
-     | identifier:i "(" arg_list:al ")" ~method_call(nil, i, al)
-     | identifier:i ~method_call(nil, i, [])
-     
      
 arg_list = expression     
          | arg_list:al "," expression:e { Array(al) << e }
 
 assign = identifier:i space* "=" space* expression:e ~assign(i,e)
 
-binary_op = space* < operators > space* literal:e { [text, e] }
-          | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, al)] }
-          | < "." > identifier:i { [text, method_call(nil, i, [])] }
+call_operation = space* < operators > space* (expression | identifier):e { [text, e] }
+               | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, al)] }
+               | < "." > identifier:i { [text, method_call(nil, i, [])] }
 
-binary_c = identifier:p binary_op+:bo { bo.flatten.unshift(p) }
-binary_send = binary_c:c { rpn(shunting_yard(c)) }
+call_chain = (expression | identifier):e call_operation+:co { co.flatten.unshift(e) }
+call = call_chain:cc { rpn(shunting_yard(cc)) }
