@@ -14,7 +14,11 @@ module Alt
       end
       
       def apply(lhs, rhs)
-        MethodCall.new(lhs, @symbol, rhs)
+        if @symbol == "."
+          MethodCall.new(lhs, rhs.method, rhs.arguments)
+        else
+          MethodCall.new(lhs, @symbol, rhs)
+        end
       end
     end
   end
