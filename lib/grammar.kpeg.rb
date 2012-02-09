@@ -2,11 +2,6 @@ require 'kpeg/compiled_parser'
 
 class Alt::Parser < KPeg::CompiledParser
 
-
-	attr_accessor :ast
-
-
-
   module ::Alt::AST
     class Node; end
     class Assignment < Node
@@ -131,25 +126,9 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # root = expressions:e { @ast = e }
+  # root = expressions
   def _root
-
-    _save = self.pos
-    while true # sequence
-      _tmp = apply(:_expressions)
-      e = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      @result = begin;  @ast = e ; end
-      _tmp = true
-      unless _tmp
-        self.pos = _save
-      end
-      break
-    end # end sequence
-
+    _tmp = apply(:_expressions)
     set_failed_rule :_root unless _tmp
     return _tmp
   end
@@ -342,7 +321,7 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_terminator] = rule_info("terminator", "\"\\n\"")
   Rules[:_number] = rule_info("number", "< digit+ > { text }")
   Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
-  Rules[:_root] = rule_info("root", "expressions:e { @ast = e }")
+  Rules[:_root] = rule_info("root", "expressions")
   Rules[:_expressions] = rule_info("expressions", "(expression:e { [e] } | expressions:es terminator expression:e { es << e } | expressions:es terminator { es } | terminator)")
   Rules[:_expression] = rule_info("expression", "(literal | assign)")
   Rules[:_literal] = rule_info("literal", "number:n {number_literal(n)}")

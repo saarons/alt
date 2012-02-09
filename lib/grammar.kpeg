@@ -1,7 +1,7 @@
 %% name = Alt::Parser
-%% {
-	attr_accessor :ast
-}
+%% ast-location = ::Alt::AST
+%% assign = ast Assignment(name, expression)
+%% number_literal = ast NumberLiteral(number)
 
 space = " "
 char = /[A-Za-z]/
@@ -11,11 +11,7 @@ terminator = "\n"
 number = < digit+ > { text }
 identifier = < char+ > { text }
 
-%% ast-location = ::Alt::AST
-%% assign = ast Assignment(name, expression)
-%% number_literal = ast NumberLiteral(number)
-
-root = expressions:e { @ast = e }
+root = expressions
 
 expressions = expression:e { [e] }
             | expressions:es terminator expression:e { es << e }
