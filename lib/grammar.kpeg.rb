@@ -68,9 +68,45 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # terminator = "\n"
-  def _terminator
+  # newline = "\n"
+  def _newline
     _tmp = match_string("\n")
+    set_failed_rule :_newline unless _tmp
+    return _tmp
+  end
+
+  # terminator = newline (space | newline)*
+  def _terminator
+
+    _save = self.pos
+    while true # sequence
+      _tmp = apply(:_newline)
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      while true
+
+        _save2 = self.pos
+        while true # choice
+          _tmp = apply(:_space)
+          break if _tmp
+          self.pos = _save2
+          _tmp = apply(:_newline)
+          break if _tmp
+          self.pos = _save2
+          break
+        end # end choice
+
+        break unless _tmp
+      end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
     set_failed_rule :_terminator unless _tmp
     return _tmp
   end
@@ -430,7 +466,8 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_space] = rule_info("space", "\" \"")
   Rules[:_char] = rule_info("char", "/[A-Za-z]/")
   Rules[:_digit] = rule_info("digit", "/[0-9]/")
-  Rules[:_terminator] = rule_info("terminator", "\"\\n\"")
+  Rules[:_newline] = rule_info("newline", "\"\\n\"")
+  Rules[:_terminator] = rule_info("terminator", "newline (space | newline)*")
   Rules[:_number] = rule_info("number", "< digit+ > { text }")
   Rules[:_identifier] = rule_info("identifier", "< char+ > { text }")
   Rules[:_root] = rule_info("root", "expressions")

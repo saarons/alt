@@ -9,7 +9,9 @@
 space = " "
 char = /[A-Za-z]/
 digit = /[0-9]/
-terminator = "\n"
+
+newline = "\n"
+terminator = newline (space | newline)*
 
 number = < digit+ > { text }
 identifier = < char+ > { text }
