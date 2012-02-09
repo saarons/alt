@@ -1,5 +1,5 @@
 require "alt/version"
+require "grammar.kpeg.rb"
 
 module Alt
-  # Your code goes here...
 end
