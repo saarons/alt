@@ -1,5 +1,6 @@
 require "alt/version"
-require "alt/operators"
+require "alt/operator"
+require "alt/precedence"
 
 require "grammar.kpeg.rb"
 

@@ -22,6 +22,19 @@ def shunting_yard(input)
     rpn << operator_stack.pop until operator_stack.empty?
   end
 end
+
+def rpn(input)
+  results = []
+  input.each do |object|
+    if object.is_a?(Alt::AST::Operator)
+      r, l = results.pop, results.pop
+      results << object.apply(l, r)
+    else
+      results << object
+    end
+  end
+  results.first
+end
 }
 
 space = " "
@@ -79,5 +92,5 @@ arg_list = expression
 
 assign = identifier:i space* "=" space* expression:e ~assign(i,e)
 
-binary_c = literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p).tap {|x| puts x.inspect} }
-binary_send = binary_c:c { shunting_yard(c) }
+binary_c = literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p) }
+binary_send = binary_c:c { rpn(shunting_yard(c)).tap {|x| puts x.inspect} }

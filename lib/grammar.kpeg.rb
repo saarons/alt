@@ -18,6 +18,19 @@ def shunting_yard(input)
   end
 end
 
+def rpn(input)
+  results = []
+  input.each do |object|
+    if object.is_a?(Alt::AST::Operator)
+      r, l = results.pop, results.pop
+      results << object.apply(l, r)
+    else
+      results << object
+    end
+  end
+  results.first
+end
+
 
 
   module ::Alt::AST
@@ -813,7 +826,7 @@ end
     return _tmp
   end
 
-  # binary_c = literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p).tap {|x| puts x.inspect} }
+  # binary_c = literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p) }
   def _binary_c
 
     _save = self.pos
@@ -930,7 +943,7 @@ end
         self.pos = _save
         break
       end
-      @result = begin;  bs.flatten.unshift(p).tap {|x| puts x.inspect} ; end
+      @result = begin;  bs.flatten.unshift(p) ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -942,7 +955,7 @@ end
     return _tmp
   end
 
-  # binary_send = binary_c:c { shunting_yard(c) }
+  # binary_send = binary_c:c { rpn(shunting_yard(c)).tap {|x| puts x.inspect} }
   def _binary_send
 
     _save = self.pos
@@ -953,7 +966,7 @@ end
         self.pos = _save
         break
       end
-      @result = begin;  shunting_yard(c) ; end
+      @result = begin;  rpn(shunting_yard(c)).tap {|x| puts x.inspect} ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -981,6 +994,6 @@ end
   Rules[:_call] = rule_info("call", "(literal:l \".\" identifier:i \"(\" arg_list:al \")\" {method_call(l, i, Array(al))} | literal:l \".\" identifier:i {method_call(l, i, [])} | expression:e \".\" identifier:i \"(\" arg_list:al \")\" {method_call(e, i, Array(al))} | expression:e \".\" identifier:i {method_call(e, i, [])} | identifier:i \"(\" arg_list:al \")\" {method_call(nil, i, Array(al))} | identifier:i {method_call(nil, i, [])})")
   Rules[:_arg_list] = rule_info("arg_list", "(expression | arg_list:al \",\" expression:e { Array(al) << e })")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
-  Rules[:_binary_c] = rule_info("binary_c", "literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p).tap {|x| puts x.inspect} }")
-  Rules[:_binary_send] = rule_info("binary_send", "binary_c:c { shunting_yard(c) }")
+  Rules[:_binary_c] = rule_info("binary_c", "literal:p (space* < operators > space* literal:e { [text, e] })+:bs { bs.flatten.unshift(p) }")
+  Rules[:_binary_send] = rule_info("binary_send", "binary_c:c { rpn(shunting_yard(c)).tap {|x| puts x.inspect} }")
 end
