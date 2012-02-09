@@ -6,34 +6,6 @@
 %% true_literal = ast TrueLiteral
 %% false_literal = ast FalseLiteral
 %% nil_literal = ast NilLiteral
-%% {
-  PRECEDENCE = {"*"   => 5,
-                "/"   => 5,
-                "+"   => 6,
-                "-"   => 6,
-                "^"   => 7,
-                "<"   => 8,
-                "<="  => 8,
-                ">"   => 8,
-                ">="  => 8,
-                "=="  => 9,
-                "!="  => 9,
-                "<=>" => 10,
-                "&&"  => 13,
-                "||"  => 14}.freeze
-                
-  def resolve(a, e, chain)
-    return [e, []] if chain.empty?
-    b, *rest = chain
-    if a && (PRECEDENCE[a] > PRECEDENCE[b] || (PRECEDENCE[a] == PRECEDENCE[b]))
-      [e, chain]
-    else
-      e2, *rest2 = rest
-      r, rest3 = resolve(b, e2, rest2)
-      resolve(a, method_call(e, b, r), rest3)
-    end
-  end
-}
 
 space = " "
 char = /[A-Za-z]/
@@ -56,12 +28,9 @@ expressions = expressions:es terminator expression:e { es << e }
             | terminator
             
 expression = assign
-           | operator
-           | secondary_expression
-           
-secondary_expression = call
-                     | literal
-                     | "(" expression:e ")" { e }
+           | call
+           | literal
+           | "(" expression:e ")" { e }
            
 literal = number:n ~number_literal(n)
         | "true" ~true_literal
@@ -80,6 +49,3 @@ arg_list = expression
          | arg_list:al "," expression:e { Array(al) << e }
 
 assign = identifier:i space* "=" space* expression:e ~assign(i,e)
-
-operator = secondary_expression:se operator_chain:oc { resolve(nil, se, oc).first }
-operator_chain = (space* binary_operator:o space* secondary_expression:se { [o, se] })+:oc { oc.flatten }
