@@ -517,7 +517,7 @@ class Alt::Parser < KPeg::CompiledParser
     return _tmp
   end
 
-  # call = (literal:l "." identifier:i {method_call(l, i, [])} | literal:l "." identifier:i "(" arg_list:al ")" {method_call(l, i, Array(al))} | expression:e "." identifier:i {method_call(e, i, [])} | expression:e "." identifier:i "(" arg_list:al ")" {method_call(e, i, Array(al))} | identifier:i {method_call(nil, i, [])} | identifier:i "(" arg_list:al ")" {method_call(nil, i, Array(al))})
+  # call = (literal:l "." identifier:i "(" arg_list:al ")" {method_call(l, i, Array(al))} | literal:l "." identifier:i {method_call(l, i, [])} | expression:e "." identifier:i "(" arg_list:al ")" {method_call(e, i, Array(al))} | expression:e "." identifier:i {method_call(e, i, [])} | identifier:i "(" arg_list:al ")" {method_call(nil, i, Array(al))} | identifier:i {method_call(nil, i, [])})
   def _call
 
     _save = self.pos
@@ -542,7 +542,23 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save1
           break
         end
-        @result = begin; method_call(l, i, []); end
+        _tmp = match_string("(")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_arg_list)
+        al = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = match_string(")")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        @result = begin; method_call(l, i, Array(al)); end
         _tmp = true
         unless _tmp
           self.pos = _save1
@@ -572,23 +588,7 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save2
           break
         end
-        _tmp = match_string("(")
-        unless _tmp
-          self.pos = _save2
-          break
-        end
-        _tmp = apply(:_arg_list)
-        al = @result
-        unless _tmp
-          self.pos = _save2
-          break
-        end
-        _tmp = match_string(")")
-        unless _tmp
-          self.pos = _save2
-          break
-        end
-        @result = begin; method_call(l, i, Array(al)); end
+        @result = begin; method_call(l, i, []); end
         _tmp = true
         unless _tmp
           self.pos = _save2
@@ -618,7 +618,23 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save3
           break
         end
-        @result = begin; method_call(e, i, []); end
+        _tmp = match_string("(")
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        _tmp = apply(:_arg_list)
+        al = @result
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        _tmp = match_string(")")
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        @result = begin; method_call(e, i, Array(al)); end
         _tmp = true
         unless _tmp
           self.pos = _save3
@@ -648,23 +664,7 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save4
           break
         end
-        _tmp = match_string("(")
-        unless _tmp
-          self.pos = _save4
-          break
-        end
-        _tmp = apply(:_arg_list)
-        al = @result
-        unless _tmp
-          self.pos = _save4
-          break
-        end
-        _tmp = match_string(")")
-        unless _tmp
-          self.pos = _save4
-          break
-        end
-        @result = begin; method_call(e, i, Array(al)); end
+        @result = begin; method_call(e, i, []); end
         _tmp = true
         unless _tmp
           self.pos = _save4
@@ -683,7 +683,23 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save5
           break
         end
-        @result = begin; method_call(nil, i, []); end
+        _tmp = match_string("(")
+        unless _tmp
+          self.pos = _save5
+          break
+        end
+        _tmp = apply(:_arg_list)
+        al = @result
+        unless _tmp
+          self.pos = _save5
+          break
+        end
+        _tmp = match_string(")")
+        unless _tmp
+          self.pos = _save5
+          break
+        end
+        @result = begin; method_call(nil, i, Array(al)); end
         _tmp = true
         unless _tmp
           self.pos = _save5
@@ -702,23 +718,7 @@ class Alt::Parser < KPeg::CompiledParser
           self.pos = _save6
           break
         end
-        _tmp = match_string("(")
-        unless _tmp
-          self.pos = _save6
-          break
-        end
-        _tmp = apply(:_arg_list)
-        al = @result
-        unless _tmp
-          self.pos = _save6
-          break
-        end
-        _tmp = match_string(")")
-        unless _tmp
-          self.pos = _save6
-          break
-        end
-        @result = begin; method_call(nil, i, Array(al)); end
+        @result = begin; method_call(nil, i, []); end
         _tmp = true
         unless _tmp
           self.pos = _save6
@@ -993,7 +993,7 @@ class Alt::Parser < KPeg::CompiledParser
   Rules[:_expression] = rule_info("expression", "(assign | operator | secondary_expression)")
   Rules[:_secondary_expression] = rule_info("secondary_expression", "(call | literal | \"(\" expression:e \")\" { e })")
   Rules[:_literal] = rule_info("literal", "(number:n {number_literal(n)} | \"true\" {true_literal} | \"false\" {false_literal} | \"nil\" {nil_literal})")
-  Rules[:_call] = rule_info("call", "(literal:l \".\" identifier:i {method_call(l, i, [])} | literal:l \".\" identifier:i \"(\" arg_list:al \")\" {method_call(l, i, Array(al))} | expression:e \".\" identifier:i {method_call(e, i, [])} | expression:e \".\" identifier:i \"(\" arg_list:al \")\" {method_call(e, i, Array(al))} | identifier:i {method_call(nil, i, [])} | identifier:i \"(\" arg_list:al \")\" {method_call(nil, i, Array(al))})")
+  Rules[:_call] = rule_info("call", "(literal:l \".\" identifier:i \"(\" arg_list:al \")\" {method_call(l, i, Array(al))} | literal:l \".\" identifier:i {method_call(l, i, [])} | expression:e \".\" identifier:i \"(\" arg_list:al \")\" {method_call(e, i, Array(al))} | expression:e \".\" identifier:i {method_call(e, i, [])} | identifier:i \"(\" arg_list:al \")\" {method_call(nil, i, Array(al))} | identifier:i {method_call(nil, i, [])})")
   Rules[:_arg_list] = rule_info("arg_list", "(expression | arg_list:al \",\" expression:e { Array(al) << e })")
   Rules[:_assign] = rule_info("assign", "identifier:i space* \"=\" space* expression:e {assign(i,e)}")
   Rules[:_operator] = rule_info("operator", "secondary_expression:se operator_chain:oc { resolve(nil, se, oc).first }")

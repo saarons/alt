@@ -60,20 +60,21 @@ expression = assign
            | secondary_expression
            
 secondary_expression = call
-           | literal
-           | "(" expression:e ")" { e }
+                     | literal
+                     | "(" expression:e ")" { e }
            
 literal = number:n ~number_literal(n)
         | "true" ~true_literal
         | "false" ~false_literal
         | "nil" ~nil_literal
         
-call = literal:l "." identifier:i ~method_call(l, i, [])
-     | literal:l "." identifier:i "(" arg_list:al ")" ~method_call(l, i, Array(al))
-     | expression:e "." identifier:i ~method_call(e, i, [])
+call = literal:l "." identifier:i "(" arg_list:al ")" ~method_call(l, i, Array(al))
+     | literal:l "." identifier:i ~method_call(l, i, [])
      | expression:e "." identifier:i "(" arg_list:al ")" ~method_call(e, i, Array(al))
-     | identifier:i ~method_call(nil, i, [])
+     | expression:e "." identifier:i ~method_call(e, i, [])
      | identifier:i "(" arg_list:al ")" ~method_call(nil, i, Array(al))
+     | identifier:i ~method_call(nil, i, [])
+     
      
 arg_list = expression     
          | arg_list:al "," expression:e { Array(al) << e }
