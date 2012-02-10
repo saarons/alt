@@ -1,6 +1,7 @@
 %% name = Alt::Parser
 %% ast-location = ::Alt::AST
 %% method_call = ast MethodCall(receiver, method, arguments)
+%% string_literal = ast StringLiteral(string)
 %% number_literal = ast NumberLiteral(number)
 %% array_literal = ast ArrayLiteral(array)
 %% function_literal = ast FunctionLiteral(arguments, expressions, pure)
@@ -9,6 +10,8 @@
 %% nil_literal = ast NilLiteral
 
 %% {
+ESCAPE_SEQUENCES = Hash[[["\\n", "\n"], ["\\b", "\b"], ["\\f", "\f"], ["\\r", "\r"], ["\\t", "\t"], ["\\\\\"", "\""], ["\\\\", "\\"]]]
+
 def shunting_yard(input)
   [].tap do |rpn|
     operator_stack = []
@@ -36,6 +39,10 @@ def rpn(input)
   end
   results.first
 end
+
+def escape(text)
+  ESCAPE_SEQUENCES.reduce(text) { |text, (k, v)| text.gsub(k, v) }
+end
 }
 
 space = " "
@@ -47,6 +54,8 @@ terminator = newline (space | newline)*
 
 number = < digit+ ("." digit+)? > { text }
 identifier = < char+ > { text }
+
+string = '"' < (/[^\"]/)* > '"' { escape(text) }
 
 - = space*
 sp-nl = (space | newline)*
@@ -80,7 +89,8 @@ value = literal
       | "(" - expression:e - ")" { e }
       | identifier
            
-literal = number:n ~number_literal(n)
+literal = string:s ~string_literal(s)
+        | number:n ~number_literal(n)
         | array:a ~array_literal(a)
         | function
         | "true" ~true_literal

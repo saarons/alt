@@ -1,4 +1,1 @@
-a = (b, c) {
-  3 + 5
-  4 < 8
-}
+a = "Good Morning Vietnam!"
