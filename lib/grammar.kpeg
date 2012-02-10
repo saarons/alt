@@ -3,7 +3,7 @@
 %% method_call = ast MethodCall(receiver, method, arguments)
 %% number_literal = ast NumberLiteral(number)
 %% array_literal = ast ArrayLiteral(array)
-%% function_literal = ast FunctionLiteral(arguments, expressions)
+%% function_literal = ast FunctionLiteral(arguments, expressions, pure)
 %% true_literal = ast TrueLiteral
 %% false_literal = ast FalseLiteral
 %% nil_literal = ast NilLiteral
@@ -95,7 +95,7 @@ argument_list = argument_list:al - "," - identifier:i { Array(al) << i }
          
 array = "[" list:l "]" { l }
 
-function = "(" argument_list:al ")" sp-nl "{" sp-nl expressions:e sp-nl "}" ~function_literal(al, e)
+function = "(" argument_list:al ")" < "!"? > sp-nl "{" sp-nl expressions:e sp-nl "}" ~function_literal(al, e, text == "!")
 
 call_operation = - < operators > - value:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
