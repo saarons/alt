@@ -1,6 +1,5 @@
 %% name = Alt::Parser
 %% ast-location = ::Alt::AST
-%% assign = ast Assignment(name, expression)
 %% method_call = ast MethodCall(receiver, method, arguments)
 %% number_literal = ast NumberLiteral(number)
 %% true_literal = ast TrueLiteral
@@ -47,7 +46,8 @@ terminator = newline (space | newline)*
 number = < digit+ ("." digit+)? > { text }
 identifier = < char+ > { text }
 
-operators = "||"
+operators = "="
+          | "||"
           | "&&"
           | "=="
           | "!="
@@ -69,7 +69,6 @@ expressions = expressions:es terminator expression:e { es << e }
             | terminator
             
 expression = call
-           | assign
            | literal
            | "(" space* expression:e space* ")" { e }
            
@@ -83,8 +82,6 @@ literal = number:n ~number_literal(n)
      
 arg_list = arg_list:al space* "," space* value:v { Array(al) << v }
          | value
-
-assign = identifier:i space* "=" space* value:v ~assign(i,v)
 
 call_operation = space* < operators > space* value:v { [text, v] }
                | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, al)] }
