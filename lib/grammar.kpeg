@@ -2,6 +2,7 @@
 %% ast-location = ::Alt::AST
 %% method_call = ast MethodCall(receiver, method, arguments)
 %% number_literal = ast NumberLiteral(number)
+%% array_literal = ast ArrayLiteral(array)
 %% true_literal = ast TrueLiteral
 %% false_literal = ast FalseLiteral
 %% nil_literal = ast NilLiteral
@@ -76,12 +77,15 @@ value = expression
       | identifier
            
 literal = number:n ~number_literal(n)
+        | array:a ~array_literal(a)
         | "true" ~true_literal
         | "false" ~false_literal
         | "nil" ~nil_literal
      
 arg_list = arg_list:al space* "," space* value:v { Array(al) << v }
          | value
+         
+array = "[" arg_list:al "]" { al }
 
 call_operation = space* < operators > space* value:v { [text, v] }
                | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, al)] }
