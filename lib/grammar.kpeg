@@ -88,8 +88,8 @@ arg_list = arg_list:al space* "," space* value:v { Array(al) << v }
 array = "[" arg_list:al "]" { al }
 
 call_operation = space* < operators > space* value:v { [text, v] }
-               | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, al)] }
-               | < "." > identifier:i { [text, method_call(nil, i, [])] }
+               | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, Array(al))] }
+               | < "." > identifier:i { [text, method_call(nil, i, nil)] }
 
 call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
