@@ -1,1 +1,1 @@
-console.bob.method()
+console.log(45.67)

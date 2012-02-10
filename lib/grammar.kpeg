@@ -70,10 +70,10 @@ expressions = expressions:es terminator expression:e { es << e }
             | terminator
             
 expression = call
-           | literal
-           | "(" space* expression:e space* ")" { e }
+           | value
            
-value = expression
+value = literal
+      | "(" space* expression:e space* ")" { e }
       | identifier
            
 literal = number:n ~number_literal(n)
@@ -88,8 +88,9 @@ arg_list = arg_list:al space* "," space* value:v { Array(al) << v }
 array = "[" arg_list:al "]" { al }
 
 call_operation = space* < operators > space* value:v { [text, v] }
-               | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, Array(al))] }
+               | array:a { ["[]", method_call(nil, "[]", a)] }
                | < "." > identifier:i { [text, method_call(nil, i, nil)] }
+               | "(" arg_list:al ")" { ["()", method_call(nil, "()", Array(al))] }
 
 call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }

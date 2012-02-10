@@ -14,8 +14,11 @@ module Alt
       end
       
       def apply(lhs, rhs)
-        if @symbol == "."
+        case @symbol
+        when "."
           MethodCall.new(lhs, rhs.method, rhs.arguments)
+        when "[]", "()"
+          MethodCall.new(lhs, @symbol, rhs.arguments)
         else
           MethodCall.new(lhs, @symbol, rhs)
         end

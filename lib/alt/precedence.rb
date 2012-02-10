@@ -22,6 +22,6 @@ module Alt
     op :left, '+', '-'
     op :left, '*', '/'
     op :right, '^'
-    op :left, '.'
+    op :left, '.', "[]", "()"
   end
 end
