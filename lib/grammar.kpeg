@@ -71,21 +71,24 @@ expressions = expressions:es terminator expression:e { es << e }
 expression = call
            | assign
            | literal
-           | "(" expression:e ")" { e }
+           | "(" space* expression:e space* ")" { e }
+           
+value = expression
+      | identifier
            
 literal = number:n ~number_literal(n)
         | "true" ~true_literal
         | "false" ~false_literal
         | "nil" ~nil_literal
      
-arg_list = expression     
-         | arg_list:al "," expression:e { Array(al) << e }
+arg_list = arg_list:al space* "," space* value:v { Array(al) << v }
+         | value
 
-assign = identifier:i space* "=" space* expression:e ~assign(i,e)
+assign = identifier:i space* "=" space* value:v ~assign(i,v)
 
-call_operation = space* < operators > space* (expression | identifier):e { [text, e] }
+call_operation = space* < operators > space* value:v { [text, v] }
                | < "." > identifier:i "(" arg_list:al ")" { [text, method_call(nil, i, al)] }
                | < "." > identifier:i { [text, method_call(nil, i, [])] }
 
-call_chain = (expression | identifier):e call_operation+:co { co.flatten.unshift(e) }
+call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
