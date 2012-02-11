@@ -4,6 +4,7 @@
 %% string_literal = ast StringLiteral(string)
 %% number_literal = ast NumberLiteral(number)
 %% array_literal = ast ArrayLiteral(array)
+%% object_literal = ast ObjectLiteral(object)
 %% function_literal = ast FunctionLiteral(arguments, expressions, pure)
 %% true_literal = ast TrueLiteral
 %% false_literal = ast FalseLiteral
@@ -92,6 +93,7 @@ value = literal
 literal = string:s ~string_literal(s)
         | number:n ~number_literal(n)
         | array:a ~array_literal(a)
+        | object:o ~object_literal(o)
         | function
         | "true" ~true_literal
         | "false" ~false_literal
@@ -106,6 +108,11 @@ argument_list = argument_list:al - "," - identifier:i { Array(al) << i }
 array = "[" list:l "]" { l }
 
 function = "(" argument_list:al ")" < "!"? > sp-nl "{" sp-nl expressions:e sp-nl "}" ~function_literal(al, e, text == "!")
+
+object = "{" sp-nl object_list:ol sp-nl "}" { ol }
+
+object_list = object_list:ol - "," sp-nl identifier:i ":" sp-nl expression:e { ol.merge(Hash[i, e]) }
+            | sp-nl identifier:i ":" sp-nl expression:e { Hash[i, e] }
 
 call_operation = - < operators > - value:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }

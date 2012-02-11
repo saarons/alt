@@ -1,1 +1,7 @@
-a = "Good Morning Vietnam!"
+a = {
+  a: console,
+  b: 2,
+  c: 3
+}
+
+a + 4
