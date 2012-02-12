@@ -105,8 +105,8 @@ literal = string:s ~string_literal(s)
         | "false" ~false_literal
         | "nil" ~nil_literal
 
-list = list:l - "," - value:v { Array(l) << v }
-     | value
+list = list:l - "," - (call | value):v { Array(l) << v }
+     | (call | value)
 
 argument_list = argument_list:al - "," - identifier:i { Array(al) << i }
               | identifier
