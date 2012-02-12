@@ -9,7 +9,7 @@ module Alt
         @precedence ||= 0
         @operators ||= {}
         operators.each do |operator|
-          @operators[operator] = AST::Operator.new(operator, @precedence, associativity)
+          @operators[operator] = Operator.new(operator, @precedence, associativity)
         end
         @precedence += 1
       end

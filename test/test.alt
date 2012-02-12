@@ -1,1 +1,1 @@
-a = "Gøød Morning Vietnam"
+a << 4 << 6 == 8
