@@ -111,7 +111,7 @@ list = list:l - "," - (call | value):cv { l << cv }
 argument_list = argument_list:al - "," - identifier:i { al << i }
               | identifier:i { [i] }
 
-array = "[" list:l "]" { l }
+array = "[" list?:l "]" { l }
 
 function = "(" argument_list:al ")" < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
 
@@ -129,7 +129,7 @@ while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
 call_operation = - < operators > - value:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
                | < "." > identifier:i { [text, method_call(nil, i, nil)] }
-               | "(" list:l ")" { ["()", method_call(nil, "()", l)] }
+               | "(" list?:l ")" { ["()", method_call(nil, "()", l)] }
 
 call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
