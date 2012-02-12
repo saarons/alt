@@ -1,7 +1,7 @@
 module Alt
   module AST
     class Operator
-      attr_accessor :symbol, :precedence, :associativity
+      attr_reader :symbol, :precedence, :associativity
 
       def initialize(symbol, precedence, associativity)
         @symbol = symbol
