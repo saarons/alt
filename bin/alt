@@ -6,15 +6,14 @@ require "pp"
 require "alt"
 require "readline"
 
+stty_save = `stty -g`.chomp
+trap("INT") { system "stty", stty_save; exit }
+
 if file = ARGV.first
   pp Alt.ast(File.read(file))
 else
   puts "alt #{Alt::VERSION}"
-  loop do
-    line = Readline::readline(">> ")
-    break unless line
-    Readline::HISTORY.push(line)
-    value = Alt.ast(line)
-    pp value
+  while line = Readline::readline(">> ", true)
+    pp Alt.ast(line)
   end
 end
