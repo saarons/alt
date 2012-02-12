@@ -105,15 +105,15 @@ literal = string:s ~string_literal(s)
         | "false" ~false_literal
         | "nil" ~nil_literal
 
-list = list:l - "," - (call | value):v { Array(l) << v }
-     | (call | value)
+list = list:l - "," - (call | value):cv { l << cv }
+     | (call | value):cv { [cv] }
 
-argument_list = argument_list:al - "," - identifier:i { Array(al) << i }
-              | identifier
+argument_list = argument_list:al - "," - identifier:i { al << i }
+              | identifier:i { [i] }
 
 array = "[" list:l "]" { l }
 
-function = "(" argument_list:al ")" < "!"? > sp-nl block:b ~function_literal(al, b, text == "!")
+function = "(" argument_list:al ")" < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
 
 object = "{" sp-nl object_list:ol sp-nl "}" { ol }
 
@@ -129,7 +129,7 @@ while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
 call_operation = - < operators > - value:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
                | < "." > identifier:i { [text, method_call(nil, i, nil)] }
-               | "(" list:l ")" { ["()", method_call(nil, "()", Array(l))] }
+               | "(" list:l ")" { ["()", method_call(nil, "()", l)] }
 
 call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
