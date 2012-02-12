@@ -117,7 +117,7 @@ function = "(" argument_list:al ")" < "!"? > sp-nl block:b ~function_literal(al,
 
 object = "{" sp-nl object_list:ol sp-nl "}" { ol }
 
-object_list = object_list:ol - "," sp-nl identifier:i ":" sp-nl expression:e { ol.merge(Hash[i, e]) }
+object_list = object_list:ol sp-nl "," sp-nl identifier:i ":" sp-nl expression:e { ol.merge(Hash[i, e]) }
             | sp-nl identifier:i ":" sp-nl expression:e { Hash[i, e] }
             
 if = "if" sp-nl conditional:c sp-nl block:b sp-nl elseif*:branches sp-nl else?:fallback ~if_statement(c, b, branches, fallback)
