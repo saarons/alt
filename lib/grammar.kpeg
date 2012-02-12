@@ -49,14 +49,14 @@ end
 }
 
 space = " "
-char = /[A-Za-z]/
+char = /\p{Alpha}/
 digit = /[0-9]/
 
 newline = "\n"
 terminator = newline (space | newline)*
 
 number = < ("-"? digit+ ("." digit+)?) | "NaN" | "-"? "Infinity" > { text }
-identifier = < char+ > { text }
+identifier = < char (char | digit)* > { text }
 
 string = '"' < ("\\\"" | /[^\"]/)* > '"' { escape(text) }
 

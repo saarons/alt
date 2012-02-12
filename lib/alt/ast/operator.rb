@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module Alt
   module AST
     class Operator
