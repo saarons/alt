@@ -5,10 +5,10 @@ require "alt/version"
 Gem::Specification.new do |s|
   s.name        = "alt"
   s.version     = Alt::VERSION
-  s.authors     = ["Sam Aarons"]
-  s.email       = ["samaarons@gmail.com"]
+  s.authors     = ["Sam Aarons", "Archibong	Archbong", "Hai	Lin", "Ethan	Nam", "Zhikun	Ma"]
+  s.email       = ["samaarons@gmail.com", "aarchibong@gmail.com", "hl2656@columbia.edu", "ethan.s.nam@gmail.com", "zm2181@columbia.edu"]
   s.homepage    = "http://www.alt-lang.org"
-  s.summary     = %q{TODO: Write a gem summary}
+  s.summary     = "Alt is a functional-ish programming language"
   s.description = %q{TODO: Write a gem description}
 
   s.rubyforge_project = "alt"
@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency "kpeg"
+  s.add_development_dependency "rake"
 end
