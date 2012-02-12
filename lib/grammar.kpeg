@@ -49,7 +49,7 @@ end
 }
 
 space = " "
-char = /\p{Alpha}/
+char = /\p{Word}/
 digit = /[0-9]/
 
 newline = "\n"
