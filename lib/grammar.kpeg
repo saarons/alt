@@ -1,6 +1,8 @@
 %% name = Alt::Parser
 %% ast-location = ::Alt::AST
 %% method_call = ast MethodCall(receiver, method, arguments)
+%% if_statement = ast IfStatement(conditional, expression, branches, fallback)
+%% while_statement = ast WhileStatement(conditional, block)
 %% string_literal = ast StringLiteral(string)
 %% number_literal = ast NumberLiteral(number)
 %% array_literal = ast ArrayLiteral(array)
@@ -61,20 +63,20 @@ string = '"' < (/[^\"]/)* > '"' { escape(text) }
 - = space*
 sp-nl = (space | newline)*
 
-operators = "="
-          | "||"
+operators = "||"
           | "&&"
           | "=="
           | "!="
-          | "<"
           | "<="
-          | ">"
+          | "<"
           | ">="
+          | ">"
           | "+"
           | "-"
           | "*"
           | "/"
           | "^"
+          | "="
 
 root = expressions
 
@@ -83,11 +85,13 @@ expressions = expressions:es terminator expression:e { es << e }
             | expression:e { [e] }
             | terminator
             
-expression = call
+expression = if
+           | while
+           | call
            | value
            
 value = literal
-      | "(" - expression:e - ")" { e }
+      | conditional
       | identifier
            
 literal = string:s ~string_literal(s)
@@ -98,21 +102,27 @@ literal = string:s ~string_literal(s)
         | "true" ~true_literal
         | "false" ~false_literal
         | "nil" ~nil_literal
-     
+
 list = list:l - "," - value:v { Array(l) << v }
      | value
 
 argument_list = argument_list:al - "," - identifier:i { Array(al) << i }
               | identifier
-         
+
 array = "[" list:l "]" { l }
 
-function = "(" argument_list:al ")" < "!"? > sp-nl "{" sp-nl expressions:e sp-nl "}" ~function_literal(al, e, text == "!")
+function = "(" argument_list:al ")" < "!"? > sp-nl block:b ~function_literal(al, b, text == "!")
 
 object = "{" sp-nl object_list:ol sp-nl "}" { ol }
 
 object_list = object_list:ol - "," sp-nl identifier:i ":" sp-nl expression:e { ol.merge(Hash[i, e]) }
             | sp-nl identifier:i ":" sp-nl expression:e { Hash[i, e] }
+            
+if = "if" sp-nl conditional:c sp-nl block:b sp-nl elseif*:branches sp-nl else?:fallback ~if_statement(c, b, branches, fallback)
+elseif = "elseif" sp-nl conditional:c sp-nl block:b ~if_statement(c, b, nil, nil)
+else = "else" sp-nl block:b { b }
+
+while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
 
 call_operation = - < operators > - value:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
@@ -121,3 +131,6 @@ call_operation = - < operators > - value:v { [text, v] }
 
 call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
+
+block = "{" sp-nl expressions:e sp-nl "}" { e }
+conditional = "(" sp-nl expression:e sp-nl ")" { e }
