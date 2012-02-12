@@ -55,7 +55,7 @@ digit = /[0-9]/
 newline = "\n"
 terminator = newline (space | newline)*
 
-number = < digit+ ("." digit+)? > { text }
+number = < ("-"? digit+ ("." digit+)?) | "NaN" | "-"? "Infinity" > { text }
 identifier = < char+ > { text }
 
 string = '"' < ("\\\"" | /[^\"]/)* > '"' { escape(text) }
