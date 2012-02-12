@@ -19,6 +19,7 @@ module Alt
     op :left, '&&'
     op :none, '==', '!='
     op :left, '<', '<=', '>', '>='
+    op :left, '<<', '>>'
     op :left, '+', '-'
     op :left, '*', '/'
     op :right, '^'
