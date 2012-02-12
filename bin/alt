@@ -4,5 +4,17 @@ $:.unshift(File.expand_path("../../lib", __FILE__))
 
 require "pp"
 require "alt"
+require "readline"
 
-pp Alt.ast(File.read(ARGV[0]))
+if file = ARGV.first
+  pp Alt.ast(File.read(file))
+else
+  puts "alt #{Alt::VERSION}"
+  loop do
+    line = Readline::readline(">> ")
+    break unless line
+    Readline::HISTORY.push(line)
+    value = Alt.ast(line)
+    pp value
+  end
+end
