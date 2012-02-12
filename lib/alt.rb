@@ -11,7 +11,11 @@ require "alt/ast/precedence"
 begin
   require "grammar.kpeg.rb"
 rescue LoadError
-  KPeg.load File.expand_path("../grammar.kpeg", __FILE__), "Alt::Parser"
+  file = File.expand_path("../grammar.kpeg", __FILE__)
+  grammar = KPeg.load_grammar(file)
+  cg = KPeg::CodeGenerator.new "Alt::Parser", grammar
+  code = cg.output.prepend("# encoding: UTF-8\n")
+  Object.module_eval code
 end
 
 module Alt
