@@ -19,7 +19,7 @@ def shunting_yard(input)
   [].tap do |rpn|
     operator_stack = []
     input.each do |object|
-      if op1 = Alt::PrecedenceTable.lookup(object)
+      if op1 = Alt::AST::PrecedenceTable.lookup(object)
         rpn << operator_stack.pop while (op2 = operator_stack.last) && (op1.left_associative? ? op1.precedence <= op2.precedence : op1.precedence < op2.precedence)
         operator_stack << op1
       else

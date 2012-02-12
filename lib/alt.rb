@@ -4,8 +4,8 @@ require "bundler/setup"
 require "kpeg"
 
 require "alt/version"
-require "alt/operator"
-require "alt/precedence"
+require "alt/ast/operator"
+require "alt/ast/precedence"
 
 begin
   require "grammar.kpeg.rb"
