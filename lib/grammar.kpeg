@@ -58,11 +58,7 @@ terminator = newline (space | newline)*
 number = < digit+ ("." digit+)? > { text }
 identifier = < char+ > { text }
 
-escaped_chars = "\\\""
-              | "\\\\"
-              
-
-string = '"' < (escaped_chars | /[^\"]/)* > '"' { escape(text) }
+string = '"' < ("\\\"" | /[^\"]/)* > '"' { escape(text) }
 
 - = space*
 sp-nl = (space | newline)*
