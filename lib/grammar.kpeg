@@ -13,7 +13,7 @@
 %% nil_literal = ast NilLiteral
 
 %% {
-ESCAPE_SEQUENCES = Hash[[["\\n", "\n"], ["\\b", "\b"], ["\\f", "\f"], ["\\r", "\r"], ["\\t", "\t"], ["\\\\\"", "\""], ["\\\\", "\\"]]]
+ESCAPE_SEQUENCES = Hash[[["\\n", "\n"], ["\\b", "\b"], ["\\f", "\f"], ["\\r", "\r"], ["\\t", "\t"], ["\\\"", "\""], ["\\\\", "\\"]]]
 
 def shunting_yard(input)
   [].tap do |rpn|
@@ -58,7 +58,11 @@ terminator = newline (space | newline)*
 number = < digit+ ("." digit+)? > { text }
 identifier = < char+ > { text }
 
-string = '"' < (/[^\"]/)* > '"' { escape(text) }
+escaped_chars = "\\\""
+              | "\\\\"
+              
+
+string = '"' < (escaped_chars | /[^\"]/)* > '"' { escape(text) }
 
 - = space*
 sp-nl = (space | newline)*
