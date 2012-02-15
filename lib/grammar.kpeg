@@ -13,7 +13,8 @@
 %% nil_literal = ast NilLiteral
 
 %% {
-ESCAPE_SEQUENCES = Hash[[["\\n", "\n"], ["\\b", "\b"], ["\\f", "\f"], ["\\r", "\r"], ["\\t", "\t"], ["\\\"", "\""], ["\\\\", "\\"]]]
+ESCAPED_QUOTE = Regexp.new("\\\\['\\\"\\p{Initial_Punctuation}\\p{Final_Punctuation}]")
+ESCAPE_SEQUENCES = Hash[[["\\n", "\n"], ["\\b", "\b"], ["\\f", "\f"], ["\\r", "\r"], ["\\t", "\t"], [ESCAPED_QUOTE, '\0'], ["\\\\", "\\"]]]
 
 def shunting_yard(input)
   [].tap do |rpn|
@@ -58,7 +59,15 @@ terminator = newline (space | newline)*
 number = < ("-"? digit+ ("." digit+)?) | "NaN" | "-"? "Infinity" > { text }
 identifier = < char (char | digit)* > { text }
 
-string = '"' < ("\\\"" | /[^\"]/)* > '"' { escape(text) }
+quote = '"'
+      | "'"
+      | /\p{Final_Punctuation}/
+      | /\p{Initial_Punctuation}/
+
+any_char = /[^'\"\p{Initial_Punctuation}\p{Final_Punctuation}]/
+escaped_quote = /\\['\"\p{Initial_Punctuation}\p{Final_Punctuation}]/
+
+string = quote < (escaped_quote | any_char)* > quote { escape(text) }
 
 - = space*
 sp-nl = (space | newline)*
