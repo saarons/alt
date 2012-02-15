@@ -3,6 +3,8 @@
 %% method_call = ast MethodCall(receiver, method, arguments)
 %% if_statement = ast IfStatement(conditional, expression, branches, fallback)
 %% while_statement = ast WhileStatement(conditional, block)
+%% return_statement = ast ReturnStatement(expression)
+%% break_statement = ast BreakStatement
 %% string_literal = ast StringLiteral(string)
 %% number_literal = ast NumberLiteral(number)
 %% array_literal = ast ArrayLiteral(array)
@@ -94,14 +96,18 @@ expressions = expressions:es terminator expression:e { es << e }
             | expression:e { [e] }
             | terminator
             
-expression = if
-           | while
-           | call
+expression = while
+           | break
+           | return
            | value
            
-value = literal
-      | conditional
-      | identifier
+value = call
+      | value_without_call
+           
+value_without_call = if
+                   | literal
+                   | conditional
+                   | identifier
            
 literal = string:s ~string_literal(s)
         | number:n ~number_literal(n)
@@ -112,8 +118,8 @@ literal = string:s ~string_literal(s)
         | "false" ~false_literal
         | "nil" ~nil_literal
 
-list = list:l - "," - (call | value):cv { l << cv }
-     | (call | value):cv { [cv] }
+list = list:l - "," - value:v { l << v }
+     | value:v { [v] }
 
 argument_list = argument_list:al - "," - identifier:i { al << i }
               | identifier:i { [i] }
@@ -121,24 +127,26 @@ argument_list = argument_list:al - "," - identifier:i { al << i }
 array = "[" list?:l "]" { l }
 
 function = ("(" argument_list:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
+return = "return" - expression?:e ~return_statement(e)
 
 object = "{" sp-nl object_list:ol sp-nl "}" { ol }
 
-object_list = object_list:ol sp-nl "," sp-nl identifier:i ":" sp-nl expression:e { ol.merge(Hash[i, e]) }
-            | sp-nl identifier:i ":" sp-nl expression:e { Hash[i, e] }
+object_list = object_list:ol sp-nl "," sp-nl identifier:i ":" sp-nl value:v { ol.merge(Hash[i, v]) }
+            | sp-nl identifier:i ":" sp-nl value:v { Hash[i, v] }
             
 if = "if" sp-nl conditional:c sp-nl block:b sp-nl elseif*:branches sp-nl else?:fallback ~if_statement(c, b, branches, fallback)
 elseif = "elseif" sp-nl conditional:c sp-nl block:b ~if_statement(c, b, nil, nil)
 else = "else" sp-nl block:b { b }
 
 while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
+break = "break" ~break_statement
 
-call_operation = - < operators > - value:v { [text, v] }
+call_operation = - < operators > - value_without_call:vwc { [text, vwc] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
                | < "." > identifier:i { [text, method_call(nil, i, nil)] }
                | "(" list?:l ")" { ["()", method_call(nil, "()", l)] }
 
-call_chain = value:v call_operation+:co { co.flatten.unshift(v) }
+call_chain = value_without_call:vwc call_operation+:co { co.flatten.unshift(vwc) }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
 
 block = "{" sp-nl expressions:e sp-nl "}" { e }

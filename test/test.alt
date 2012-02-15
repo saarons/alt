@@ -1,1 +1,6 @@
-µµø = 4
+a = (x, y) {
+  sum = (a, b) {
+    a + b
+  }
+  return sum(x, y)
+}
