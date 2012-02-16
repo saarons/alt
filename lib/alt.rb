@@ -1,12 +1,7 @@
 # encoding: UTF-8
 
 require "bundler/setup"
-
 require "kpeg"
-require "alt/version"
-
-require "alt/ast/operator"
-require "alt/ast/precedence"
 
 begin
   require "grammar.kpeg.rb"
@@ -18,11 +13,9 @@ rescue LoadError
   Object.module_eval code
 end
 
-require "alt/ast/number_literal"
-
-require "alt/value"
-require "alt/string"
-require "alt/number"
+Dir["#{File.dirname(__FILE__)}/alt/*.rb"].sort.each do |path|
+  require "alt/#{File.basename(path, '.rb')}"
+end
 
 module Alt
   def self.ast(program)

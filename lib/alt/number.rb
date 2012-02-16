@@ -1,9 +1,10 @@
+# encoding: UTF-8
+
+require "alt/value"
 require "bigdecimal"
 
-module Alt
-  class Number < Value
-    def initialize(string)
-      @value = BigDecimal.new(string)
-    end 
-  end
+class Alt::Number < Alt::Value
+  def initialize(string)
+    @value = BigDecimal.new(string)
+  end 
 end
