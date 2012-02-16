@@ -87,7 +87,7 @@ operators = "||"
           | "*"
           | "/"
           | "^"
-          | "="
+          | equals_sign
           
 equals_sign = "="
             | "＝"
