@@ -53,7 +53,7 @@ end
 
 space = " "
 char = /\p{Word}/
-digit = /[0-9]/
+digit = /\p{Digit}/
 
 newline = "\n"
 terminator = newline (space | newline)*
@@ -88,6 +88,9 @@ operators = "||"
           | "/"
           | "^"
           | "="
+          
+equals_sign = "="
+            | "＝"
 
 root = expressions
 
