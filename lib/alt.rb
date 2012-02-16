@@ -20,6 +20,10 @@ end
 
 require "alt/ast/number_literal"
 
+require "alt/value"
+require "alt/string"
+require "alt/number"
+
 module Alt
   def self.ast(program)
     parser = Parser.new(program)
