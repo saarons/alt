@@ -3,8 +3,8 @@
 require "bundler/setup"
 
 require "kpeg"
-
 require "alt/version"
+
 require "alt/ast/operator"
 require "alt/ast/precedence"
 
@@ -17,6 +17,8 @@ rescue LoadError
   code = cg.output.prepend("# encoding: UTF-8\n")
   Object.module_eval code
 end
+
+require "alt/ast/number_literal"
 
 module Alt
   def self.ast(program)
