@@ -1,9 +1,9 @@
 %% name = Alt::Parser
 %% ast-location = ::Alt::AST
 %% method_call = ast MethodCall(receiver, method, arguments)
-%% if_statement = ast IfStatement(conditional, expression, branches, fallback)
-%% while_statement = ast WhileStatement(conditional, block)
-%% return_statement = ast ReturnStatement(expression)
+%% if_statement = ast IfStatement(value, expression, branches, fallback)
+%% while_statement = ast WhileStatement(value, block)
+%% return_statement = ast ReturnStatement(value)
 %% break_statement = ast BreakStatement
 %% string_literal = ast StringLiteral(string)
 %% number_literal = ast NumberLiteral(number)
@@ -127,7 +127,7 @@ argument_list = argument_list:al - "," - identifier:i { al << i }
 array = "[" list?:l "]" { l }
 
 function = ("(" argument_list:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
-return = "return" - expression?:e ~return_statement(e)
+return = "return" - value?:v ~return_statement(v)
 
 object = "{" sp-nl object_list:ol sp-nl "}" { ol }
 
@@ -150,4 +150,4 @@ call_chain = value_without_call:vwc call_operation+:co { co.flatten.unshift(vwc)
 call = call_chain:cc { rpn(shunting_yard(cc)) }
 
 block = "{" sp-nl expressions:e sp-nl "}" { e }
-conditional = "(" sp-nl expression:e sp-nl ")" { e }
+conditional = "(" sp-nl value:v sp-nl ")" { v }
