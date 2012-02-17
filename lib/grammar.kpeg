@@ -144,17 +144,17 @@ else = "else" sp-nl block:b { b }
 while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
 break = "break" ~break_statement
 
-assign_operation = - equals_sign - { ["="] }
-call_operation = - < operators > - { [text] }
+assign_operation = - equals_sign - value:v { ["=", v] }
+call_operation = - < operators > - value2:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
                | < "." > identifier:i { [text, method_call(nil, i, nil)] }
                | "(" list?:l ")" { ["()", method_call(nil, "()", l)] }
 
 
-call_operation_chain = value2:v call_operation:co { [v, co] }
+call_operation_chain = value2:v call_operation+:co { [v, co] }
 assign_operation_chain = identifier:i assign_operation:ao { [i, ao] }
 
-call_chain = (assign_operation_chain | call_operation_chain)+:cc value2:v { cc.flatten << v }
+call_chain = (assign_operation_chain | call_operation_chain)+:cc { cc.flatten.tap { |x| puts x.inspect } }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
 
 block = "{" sp-nl expressions:e sp-nl "}" { e }
