@@ -154,7 +154,7 @@ call_operation = - < operators > - value2:v { [text, v] }
 call_operation_chain = value2:v call_operation+:co { [v, co] }
 assign_operation_chain = identifier:i assign_operation:ao { [i, ao] }
 
-call_chain = (assign_operation_chain | call_operation_chain)+:cc { cc.flatten.tap { |x| puts x.inspect } }
+call_chain = (assign_operation_chain | call_operation_chain)+:cc { cc.flatten }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
 
 block = "{" sp-nl expressions:e sp-nl "}" { e }
