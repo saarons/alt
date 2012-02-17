@@ -1,5 +1,6 @@
 %% name = Alt::Parser
 %% ast-location = ::Alt::AST
+%% assign_call = ast AssignCall(identifier, value)
 %% method_call = ast MethodCall(receiver, method, arguments)
 %% if_statement = ast IfStatement(value, expression, branches, fallback)
 %% while_statement = ast WhileStatement(value, block)
@@ -87,7 +88,6 @@ operators = "||"
           | "*"
           | "/"
           | "^"
-          | equals_sign
           
 equals_sign = "="
             | "＝"
@@ -105,12 +105,12 @@ expression = while
            | value
            
 value = call
-      | value_without_call
+      | value2
            
-value_without_call = if
-                   | literal
-                   | conditional
-                   | identifier
+value2 = if
+       | literal
+       | conditional
+       | identifier
            
 literal = string:s ~string_literal(s)
         | number:n ~number_literal(n)
@@ -144,12 +144,17 @@ else = "else" sp-nl block:b { b }
 while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
 break = "break" ~break_statement
 
-call_operation = - < operators > - value_without_call:vwc { [text, vwc] }
+assign_operation = - equals_sign - { ["="] }
+call_operation = - < operators > - { [text] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
                | < "." > identifier:i { [text, method_call(nil, i, nil)] }
                | "(" list?:l ")" { ["()", method_call(nil, "()", l)] }
 
-call_chain = value_without_call:vwc call_operation+:co { co.flatten.unshift(vwc) }
+
+call_operation_chain = value2:v call_operation:co { [v, co] }
+assign_operation_chain = identifier:i assign_operation:ao { [i, ao] }
+
+call_chain = (assign_operation_chain | call_operation_chain)+:cc value2:v { cc.flatten << v }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
 
 block = "{" sp-nl expressions:e sp-nl "}" { e }

@@ -19,6 +19,8 @@ class Alt::AST::Operator
       Alt::AST::MethodCall.new(lhs, rhs.method, rhs.arguments)
     when "[]", "()"
       Alt::AST::MethodCall.new(lhs, @symbol, rhs.arguments)
+    when "="
+      Alt::AST::AssignCall.new(lhs, rhs)
     else
       Alt::AST::MethodCall.new(lhs, @symbol, rhs)
     end
