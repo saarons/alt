@@ -153,7 +153,7 @@ assign_operation = identifier:i - equals_sign - value2:v call_operation*:co { [i
 
 call_operation_chain = value2:v call_operation+:co { [v, co] }
 
-call_chain = (assign_operation | call_operation_chain+):cc  { cc.flatten }
+call_chain = (assign_operation | call_operation_chain)+:cc  { cc.flatten }
 call = call_chain:cc { rpn(shunting_yard(cc)) }
 
 block = "{" sp-nl expressions:e sp-nl "}" { e }
