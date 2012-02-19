@@ -20,7 +20,9 @@ class Alt::Function < Alt::Value
     receiver.arguments.each_with_index do |param, index|
       context.locals[param] = arguments[index] || Alt::Nil.instance
     end
-
-    receiver.expressions.eval(context)
+    
+    catch :return do
+      receiver.expressions.eval(context)
+    end
   end
 end
