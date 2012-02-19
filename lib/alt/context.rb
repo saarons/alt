@@ -1,9 +1,10 @@
 # encoding: UTF-8
 
 class Alt::Context
-  attr_reader :locals
+  attr_reader :locals, :pure
   
-  def initialize(parent = nil)
+  def initialize(parent = nil, pure = false)
+    @pure = pure
     @locals = {}
     @parent = parent
   end
