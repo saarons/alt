@@ -1,9 +1,2 @@
-a = (x, y) {
-  sum = (a, b) {
-    a + b
-  }
-  return sum(x, y)
-}
-
-
-a = 4 + 5 && x < 9
+a = (x, y) { x + y }
+a(1, 3)

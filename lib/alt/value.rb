@@ -9,7 +9,7 @@ class Alt::Value
     val = self.class.alt[name]
     case val
     when Proc
-      proc { |method, *args| val.call(self, *args) }
+      val.lambda? ? proc { |method, *args| val.call(self, *args) } : val.call(self, *args)
     else
       val
     end

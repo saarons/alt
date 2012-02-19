@@ -22,7 +22,7 @@ class Alt::AST::Operator
     when "="
       Alt::AST::AssignCall.new(lhs, rhs)
     else
-      Alt::AST::MethodCall.new(lhs, @symbol, rhs)
+      Alt::AST::MethodCall.new(lhs, @symbol, Array(rhs))
     end
   end
 end

@@ -4,7 +4,13 @@ require "alt/value"
 require "bigdecimal"
 
 class Alt::Number < Alt::Value
+  attr_reader :value
+  
   def initialize(string)
     @value = BigDecimal.new(string)
-  end 
+  end
+  
+  alt["+"] = proc do |receiver, *arguments|
+    Alt::Number.new(receiver.value + arguments.first.value)
+  end
 end
