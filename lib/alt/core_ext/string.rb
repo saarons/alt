@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 class String
-  def eval
-    raise "Not Implemented"
+  def eval(context)
+    context[self]
   end
 end

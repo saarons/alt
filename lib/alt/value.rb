@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-class Alt::Value
+class Alt::Value  
   def self.alt
     @alt ||= {}
   end

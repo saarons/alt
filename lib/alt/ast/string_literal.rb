@@ -3,7 +3,7 @@
 require "alt/string"
 
 class Alt::AST::StringLiteral
-  def eval
+  def eval(context)
     Alt::String.new(@string)
   end
 end

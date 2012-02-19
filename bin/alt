@@ -10,11 +10,14 @@ require "readline"
 stty_save = `stty -g`.chomp
 trap("INT") { system "stty", stty_save; exit }
 
+interpreter = Alt::Interpreter.new
+
 if file = ARGV.first
   pp Alt.ast(File.read(file))
 else
   puts "alt #{Alt::VERSION}"
   while line = Readline::readline(">> ", true)
-    pp Alt.ast(line)
+    val = interpreter.eval(line)
+    pp val if val
   end
 end
