@@ -6,9 +6,10 @@ class Alt::Value
   end
   
   def [](name, *args)
-    case val = self.class.alt[name]
+    val = self.class.alt[name]
+    case val
     when Proc
-      val.call(self, *args)
+      proc { |method, *args| val.call(self, *args) }
     else
       val
     end
