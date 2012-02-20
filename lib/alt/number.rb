@@ -33,7 +33,7 @@ class Alt::Number < Alt::Value
     if @value.denominator == 1
       @value.numerator.to_s
     else
-      @value.inspect
+      "#{@value.numerator}/#{@value.denominator}"
     end
   end
 end
