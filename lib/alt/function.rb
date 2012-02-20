@@ -25,4 +25,8 @@ class Alt::Function < Alt::Value
       receiver.expressions.eval(context)
     end
   end
+  
+  def inspect
+    "(#{arguments.join(", ")})#{"!" unless @pure} { ... }"
+  end
 end
