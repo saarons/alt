@@ -25,5 +25,8 @@ class Alt::Number < Alt::Value
   alt["/"] = proc do |receiver, *arguments|
     Alt::Number.new(receiver.value / arguments.first.value)
   end
-
+  
+  def inspect
+    @value.to_s("F")
+  end
 end

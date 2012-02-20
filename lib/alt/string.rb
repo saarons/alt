@@ -17,4 +17,8 @@ class Alt::String < Alt::Value
     s = s.each_char.map { |c| FULLWIDTH_TO_ASCII.include?(c) ? FULLWIDTH_TO_ASCII[c] : c }.join
     Alt::Number.new(s)
   end
+  
+  def inspect
+    @value.inspect
+  end
 end
