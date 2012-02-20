@@ -17,12 +17,12 @@ class Alt::AST::Operator
     case @symbol
     when "."
       Alt::AST::MethodCall.new(lhs, rhs.method, rhs.arguments)
-    when "[]", "()"
+    when "()"
       Alt::AST::MethodCall.new(lhs, @symbol, rhs.arguments)
     when "="
       Alt::AST::AssignCall.new(lhs, rhs)
     else
-      Alt::AST::MethodCall.new(lhs, @symbol, Array(rhs))
+      Alt::AST::MethodCall.new(Alt::AST::MethodCall.new(lhs, @symbol, nil), "()", Array(rhs))
     end
   end
 end

@@ -12,7 +12,7 @@ class Alt::String < Alt::Value
     @value = value
   end
   
-  alt["to_i"] = lambda do |receiver, *arguments|
+  embedded_function("to_i") do |receiver, arguments|
     s = receiver.value
     s = s.each_char.map { |c| FULLWIDTH_TO_ASCII.include?(c) ? FULLWIDTH_TO_ASCII[c] : c }.join
     Alt::Number.new(s)

@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+$:.unshift(File.expand_path("../../lib", __FILE__))
+
+require "pp"
+require "alt"
+require "readline"
+
+stty_save = `stty -g`.chomp
+trap("INT") { system "stty", stty_save; exit }
+
+if file = ARGV.first
+  Alt.ast(File.read(file))
+else
+  puts "alt #{Alt::VERSION}"
+  while line = Readline::readline(">> ", true)
+    val = Alt.ast(line)
+    pp val if val
+  end
+end

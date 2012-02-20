@@ -9,23 +9,23 @@ class Alt::Number < Alt::Value
     @value = Rational(value)
   end
   
-  alt["+"] = proc do |receiver, *arguments|
+  embedded_function("+") do |receiver, arguments|
     Alt::Number.new(receiver.value + arguments.first.value)
   end
 
-  alt["-"] = proc do |receiver, *arguments|
+  embedded_function("-") do |receiver, arguments|
     Alt::Number.new(receiver.value - arguments.first.value)
   end
 
-  alt["*"] = proc do |receiver, *arguments|
+  embedded_function("*") do |receiver, arguments|
     Alt::Number.new(receiver.value * arguments.first.value)
   end
 
-  alt["/"] = proc do |receiver, *arguments|
+  embedded_function("/") do |receiver, arguments|
     Alt::Number.new(receiver.value / arguments.first.value)
   end
   
-  alt["^"] = proc do |receiver, *arguments|
+  embedded_function("^") do |receiver, arguments|
     Alt::Number.new(receiver.value ** arguments.first.value)
   end
   

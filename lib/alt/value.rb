@@ -5,14 +5,22 @@ class Alt::Value
     @alt ||= {}
   end
   
-  def [](name, *args)
+  def [](name, *args)    
     val = self.class.alt[name]
-    case val
-    when Proc
-      val.lambda? ? proc { |method, *args| val.call(self, *args) } : val.call(self, *args)
+    if name == "()"
+      self.call(args)
     else
-      val
+      case val
+      when Alt::EmbeddedFunction
+        val.curry(self)
+      else
+        val
+      end
     end
+  end
+  
+  def self.embedded_function(name, pure = true, &block)
+    alt[name] = Alt::EmbeddedFunction.new(pure, block)
   end
   
   def to_boolean
@@ -23,12 +31,6 @@ class Alt::Value
       true
     end
   end
-  
-  alt["&&"] = proc do |receiver, *arguments|
-    if receiver.to_boolean && arguments.first.to_boolean
-      arguments.first
-    else
-      receiver
-    end
-  end
 end
+
+require "alt/embedded_function"

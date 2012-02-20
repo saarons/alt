@@ -14,15 +14,15 @@ class Alt::Function < Alt::Value
     @expressions = expressions
   end
 
-  alt["()"] = proc do |receiver, *arguments|
-    context = Alt::Context.new(receiver.context, receiver.pure)
+  def call(arguments)
+    context = Alt::Context.new(@context, @pure)
 
-    receiver.arguments.each_with_index do |param, index|
+    @arguments.each_with_index do |param, index|
       context[param] = arguments[index] || Alt::Nil.instance
     end
     
     catch :return do
-      receiver.expressions.eval(context)
+      @expressions.eval(context)
     end
   end
   
