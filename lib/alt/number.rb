@@ -26,6 +26,10 @@ class Alt::Number < Alt::Value
     Alt::Number.new(receiver.value / arguments.first.value)
   end
   
+  alt["^"] = proc do |receiver, *arguments|
+    Alt::Number.new(receiver.value ** arguments.first.value)
+  end
+  
   def inspect
     @value.to_s("F")
   end
