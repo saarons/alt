@@ -1,12 +1,13 @@
 # encoding: UTF-8
 
 class Alt::Context
-  attr_accessor :catch_break
+  attr_accessor :expect_break
   
   def initialize(parent = nil, pure = false)
     @pure = pure
     @locals = {}
     @parent = parent
+    @expect_break = false
   end
   
   def [](name)
@@ -19,5 +20,11 @@ class Alt::Context
     else
       @locals[name] = value
     end
+  end
+  
+  def give_me_a_break
+    @expect_break = true
+    yield self
+    @expect_break = false
   end
 end
