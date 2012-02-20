@@ -2,6 +2,8 @@
 %% ast-location = ::Alt::AST
 %% assign_call = ast AssignCall(identifier, value)
 %% method_call = ast MethodCall(receiver, method, arguments)
+%% and_operator = ast AndOperator(lhs, rhs)
+%% or_operator = ast OrOperator(lhs, rhs)
 %% if_statement = ast IfStatement(conditionals, fallback)
 %% while_statement = ast WhileStatement(value, block)
 %% return_statement = ast ReturnStatement(value)
