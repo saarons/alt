@@ -6,7 +6,7 @@ class Alt::Value
   end
   
   def [](name, *args)    
-    val = self.class.alt[name]
+    val = lookup(name)
     if name == "()"
       self.call(args)
     else
@@ -22,6 +22,7 @@ class Alt::Value
   end
   
   def self.embedded_function(name, pure = true, &block)
+    require "alt/embedded_function"
     alt[name] = Alt::EmbeddedFunction.new(name, pure, block)
   end
   
@@ -33,6 +34,23 @@ class Alt::Value
       true
     end
   end
+  
+  embedded_function("&&") do |receiver, arguments|
+    if receiver.to_boolean && arguments.first.to_boolean
+      arguments.first
+    else
+      receiver
+    end
+  end
+  
+  embedded_function("||") do |receiver, arguments|
+    arguments.unshift(receiver).find(proc { arguments.last }) { |x| x.to_boolean }
+  end
+  
+  private
+  def lookup(name)
+    klass = self.class
+    superklass = klass.superclass
+    klass.alt[name] || (superklass.respond_to?(:alt) ? superklass.alt[name] : nil)
+  end
 end
-
-require "alt/embedded_function"
