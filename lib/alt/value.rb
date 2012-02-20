@@ -23,4 +23,12 @@ class Alt::Value
       true
     end
   end
+  
+  alt["&&"] = proc do |receiver, *arguments|
+    if receiver.to_boolean && arguments.first.to_boolean
+      arguments.first
+    else
+      receiver
+    end
+  end
 end
