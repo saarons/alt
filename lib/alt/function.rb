@@ -18,7 +18,7 @@ class Alt::Function < Alt::Value
     context = Alt::Context.new(receiver.context, receiver.pure)
 
     receiver.arguments.each_with_index do |param, index|
-      context.locals[param] = arguments[index] || Alt::Nil.instance
+      context[param] = arguments[index] || Alt::Nil.instance
     end
     
     catch :return do
