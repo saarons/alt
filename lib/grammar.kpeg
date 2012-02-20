@@ -59,7 +59,7 @@ digit = /\p{Digit}/
 newline = "\n"
 terminator = newline (space | newline)*
 
-number = < ("-"? digit+ ("." digit+)?) | "NaN" | "-"? "Infinity" > { text }
+number = < "-"? digit+ ("." digit+)? > { text }
 identifier = < char (char | digit)* > { text }
 
 any_char = /[^'\"\p{Initial_Punctuation}\p{Final_Punctuation}]/

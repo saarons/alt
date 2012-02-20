@@ -1,13 +1,12 @@
 # encoding: UTF-8
 
 require "alt/value"
-require "bigdecimal"
 
 class Alt::Number < Alt::Value
   attr_reader :value
   
-  def initialize(string)
-    @value = BigDecimal.new(string)
+  def initialize(value)
+    @value = Rational(value)
   end
   
   alt["+"] = proc do |receiver, *arguments|
@@ -31,6 +30,10 @@ class Alt::Number < Alt::Value
   end
   
   def inspect
-    @value.to_s("F")
+    if @value.denominator == 1
+      @value.numerator.to_s
+    else
+      @value.inspect
+    end
   end
 end
