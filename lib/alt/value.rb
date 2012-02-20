@@ -11,7 +11,7 @@ class Alt::Value
       self.call(args)
     else
       case val
-      when Alt::EmbeddedFunction
+      when Alt::Method
         val.curry(self)
       when nil
         raise(Alt::UndefinedValue, [self, name])
@@ -21,9 +21,9 @@ class Alt::Value
     end
   end
   
-  def self.embedded_function(name, pure = true, &block)
-    require "alt/embedded_function"
-    alt[name] = Alt::EmbeddedFunction.new(name, pure, block)
+  def self.method(name, pure = true, &block)
+    require "alt/method"
+    alt[name] = Alt::Method.new(name, pure, block)
   end
   
   def to_boolean
