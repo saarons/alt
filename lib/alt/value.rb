@@ -35,18 +35,6 @@ class Alt::Value
     end
   end
   
-  embedded_function("&&") do |receiver, arguments|
-    if receiver.to_boolean && arguments.first.to_boolean
-      arguments.first
-    else
-      receiver
-    end
-  end
-  
-  embedded_function("||") do |receiver, arguments|
-    arguments.unshift(receiver).find(proc { arguments.last }) { |x| x.to_boolean }
-  end
-  
   private
   def lookup(name)
     klass = self.class
