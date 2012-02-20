@@ -1,2 +1,5 @@
-a = (x, y) { return x + y }
-a(1, 3)
+if (x < 3) {
+  console.log("hello")
+} else {
+  console.log("bye")
+}

@@ -14,4 +14,13 @@ class Alt::Value
       val
     end
   end
+  
+  def to_boolean
+    case self
+    when Alt::False, Alt::Nil
+      false
+    else
+      true
+    end
+  end
 end

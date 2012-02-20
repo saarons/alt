@@ -2,7 +2,7 @@
 %% ast-location = ::Alt::AST
 %% assign_call = ast AssignCall(identifier, value)
 %% method_call = ast MethodCall(receiver, method, arguments)
-%% if_statement = ast IfStatement(value, expression, branches, fallback)
+%% if_statement = ast IfStatement(conditionals, fallback)
 %% while_statement = ast WhileStatement(value, block)
 %% return_statement = ast ReturnStatement(value)
 %% break_statement = ast BreakStatement
@@ -137,9 +137,11 @@ object = "{" sp-nl object_list:ol sp-nl "}" { ol }
 object_list = object_list:ol sp-nl "," sp-nl identifier:i ":" sp-nl value:v { ol.merge(Hash[i, v]) }
             | sp-nl identifier:i ":" sp-nl value:v { Hash[i, v] }
             
-if = "if" sp-nl conditional:c sp-nl block:b sp-nl elseif*:branches sp-nl else?:fallback ~if_statement(c, b, branches, fallback)
-elseif = "elseif" sp-nl conditional:c sp-nl block:b ~if_statement(c, b, nil, nil)
+if = "if" sp-nl conditional_block:primary sp-nl elseif*:alternates sp-nl else?:fallback { if_statement(alternates.unshift(primary), fallback) }
+elseif = "elseif" sp-nl conditional_block:cb sp-nl { cb }
 else = "else" sp-nl block:b { b }
+
+conditional_block = conditional:c sp-nl block:b { [c, b] }
 
 while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
 break = "break" ~break_statement
