@@ -20,6 +20,6 @@ class Alt::EmbeddedFunction < Alt::Value
   end
   
   def inspect
-    "##{@name} (...)#{"!" unless @pure} { ... }"
+    "#{"!" unless @pure} { #{@name} }"
   end
 end
