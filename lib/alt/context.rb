@@ -1,6 +1,8 @@
 # encoding: UTF-8
 
-class Alt::Context  
+class Alt::Context
+  attr_accessor :catch_break
+  
   def initialize(parent = nil, pure = false)
     @pure = pure
     @locals = {}
