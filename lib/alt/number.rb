@@ -13,4 +13,8 @@ class Alt::Number < Alt::Value
   alt["+"] = proc do |receiver, *arguments|
     Alt::Number.new(receiver.value + arguments.first.value)
   end
+
+  alt["-"] = proc do |reciever, *arguments|
+    Alt::Number.new(receiver.value - arguments.first.value)
+  end
 end
