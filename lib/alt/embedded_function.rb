@@ -5,7 +5,8 @@ require "alt/value"
 class Alt::EmbeddedFunction < Alt::Value
   attr_reader :pure
   
-  def initialize(pure, block)
+  def initialize(name, pure, block)
+    @name = name
     @pure = pure
     @block = block
   end
@@ -15,6 +16,10 @@ class Alt::EmbeddedFunction < Alt::Value
   end
   
   def curry(receiver)
-    Alt::EmbeddedFunction.new(@pure, @block.curry[receiver])
+    Alt::EmbeddedFunction.new(@name, @pure, @block.curry[receiver])
+  end
+  
+  def inspect
+    "##{@name} (...)#{"!" unless @pure} { ... }"
   end
 end

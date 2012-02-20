@@ -21,7 +21,7 @@ else
       val = interpreter.eval(line)
       pp val if val
     rescue Alt::RuntimeError => e
-      puts "### #{e}"
+      puts "ERROR: #{e}"
     end
   end
 end

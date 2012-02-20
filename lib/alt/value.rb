@@ -13,6 +13,8 @@ class Alt::Value
       case val
       when Alt::EmbeddedFunction
         val.curry(self)
+      when nil
+        raise(Alt::UndefinedValue, [self, name])
       else
         val
       end
@@ -20,7 +22,7 @@ class Alt::Value
   end
   
   def self.embedded_function(name, pure = true, &block)
-    alt[name] = Alt::EmbeddedFunction.new(pure, block)
+    alt[name] = Alt::EmbeddedFunction.new(name, pure, block)
   end
   
   def to_boolean

@@ -24,3 +24,14 @@ class Alt::VariableReassignment < Alt::RuntimeError
     "variable '#{@variable}' can not be reassigned"
   end
 end
+
+class Alt::UndefinedValue < Alt::RuntimeError
+  def initialize(rv)
+    super
+    @receiver, @value = rv
+  end
+  
+  def to_s
+    "'#{@receiver.inspect}' does not respond to '#{@value}'"
+  end
+end
