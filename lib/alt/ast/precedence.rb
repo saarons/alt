@@ -17,14 +17,14 @@ module Alt::AST::PrecedenceTable
   end
 
   # operator precedence, low to high
-  op :right, '='
-  op :left, '||'
-  op :left, '&&'
-  op :none, '==', '!='
-  op :left, '<', '<=', '>', '>='
-  op :left, '<<', '>>'
-  op :left, '+', '-'
-  op :left, '*', '/'
-  op :right, '^'
-  op :left, '.', "[]", "()"
+  op :right, "="
+  op :left,  "||"
+  op :left,  "&&"
+  op :none,  "==", "!="
+  op :left,  "<", "<=", ">", ">="
+  op :left,  "<<", ">>"
+  op :left,  "+", "-"
+  op :left,  "*", "/"
+  op :right, "^"
+  op :left,  ".", "[]", "()"
 end
