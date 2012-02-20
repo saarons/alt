@@ -2,6 +2,6 @@
 
 class String
   def eval(context)
-    context[self] || raise(Alt::UndefinedVariable, self)
+    context[self]
   end
 end

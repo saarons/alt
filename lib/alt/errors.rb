@@ -13,3 +13,14 @@ class Alt::UndefinedVariable < Alt::RuntimeError
     "undefined variable #{@variable}"
   end
 end
+
+class Alt::VariableReassignment < Alt::RuntimeError
+  def initialize(variable)
+    super
+    @variable = variable
+  end
+  
+  def to_s
+    "variable '#{@variable}' can not be reassigned"
+  end
+end

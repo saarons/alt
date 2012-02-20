@@ -8,10 +8,14 @@ class Alt::Context
   end
   
   def [](name)
-    @locals[name] || @parent.try(:[], name)
+    @locals[name] || @parent.try(:[], name) || raise(Alt::UndefinedVariable, name)
   end
   
   def []=(name, value)
-    @locals[name] = value
+    if @locals[name]
+      raise Alt::VariableReassignment, name
+    else
+      @locals[name] = value
+    end
   end
 end
