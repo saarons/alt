@@ -2,6 +2,6 @@
 
 class Alt::AST::BreakStatement
   def eval(context)
-    throw :break if context.catch_break
+    context.catch_break ? (throw :break) : Alt::Nil.instance
   end
 end
