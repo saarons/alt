@@ -1,5 +1,5 @@
-if (x < 3) {
-  console.log("hello")
+if (true) {
+  1 + 4
 } else {
-  console.log("bye")
+  2 + 5
 }

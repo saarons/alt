@@ -13,11 +13,15 @@ trap("INT") { system "stty", stty_save; exit }
 interpreter = Alt::Interpreter.new
 
 if file = ARGV.first
-  pp Alt.ast(File.read(file))
+  interpreter.eval(File.read(file))
 else
   puts "alt #{Alt::VERSION}"
   while line = Readline::readline(">> ", true)
-    val = interpreter.eval(line)
-    pp val if val
+    begin
+      val = interpreter.eval(line)
+      pp val if val
+    rescue Alt::RuntimeError => e
+      puts "### #{e}"
+    end
   end
 end
