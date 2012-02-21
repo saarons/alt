@@ -6,7 +6,10 @@ require "alt/runtime"
 
 class Alt::Runtime::REPL < Alt::Runtime
   def handle_return_value(value)
-    pp value if value
+    if value
+      print "=> "
+      pp value
+    end
   end
   
   def handle_error(e)

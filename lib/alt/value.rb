@@ -35,6 +35,17 @@ class Alt::Value
     end
   end
   
+  def self.from(object)
+    case object
+    when ::String
+      Alt::String.new(object)
+    when Hash
+      Alt::Object.new(object.reduce({}) { |memo, (k, v)| memo.merge(k.to_s => from(v)) })
+    when Array
+      Alt::Array.new(object.map { |o| from(o) })
+    end
+  end
+  
   private
   def lookup(name)
     klass = self.class

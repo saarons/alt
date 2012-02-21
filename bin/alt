@@ -11,7 +11,7 @@ trap("INT") { system "stty", stty_save; exit }
 interpreter = Alt::Interpreter.new
 
 runtime = if file = ARGV.first
-  Alt::Runtime::Default.new(file: file)
+  Alt::Runtime::Default.new(file: file, args: ARGV, env: ENV)
 else
   Alt::Runtime::REPL.new
 end

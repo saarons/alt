@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-class Alt::Context
+class Alt::Context  
   attr_accessor :expect_break
   
   def initialize(parent = nil, pure = false)
@@ -26,5 +26,9 @@ class Alt::Context
     @expect_break = true
     yield self
     @expect_break = false
+  end
+  
+  DEFAULT = Alt::Context.new.tap do |c|
+    c["print"] = proc { |symbol, arguments| puts arguments.inspect; Alt::Nil.instance }
   end
 end

@@ -29,7 +29,7 @@ class Alt::Runtime
   end
   
   def context
-    @context ||= Alt::Context.new
+    @context ||= Alt::Context::DEFAULT
   end
 end
 
