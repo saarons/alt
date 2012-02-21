@@ -3,8 +3,8 @@
 require "alt/context"
 
 class Alt::Interpreter
-  def initialize
-    @context = Alt::Context.new
+  def initialize(context = nil)
+    @context = context || Alt::Context.new
   end
 
   def eval(code)

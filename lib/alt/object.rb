@@ -3,7 +3,7 @@
 require "alt/value"
 
 class Alt::Object < Alt::Value
-  def initialize(object)
+  def initialize(object = {})
     @value = object
   end
 end

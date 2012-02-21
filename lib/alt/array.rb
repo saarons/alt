@@ -3,7 +3,7 @@
 require "alt/value"
 
 class Alt::Array < Alt::Value
-  def initialize(array)
+  def initialize(array = [])
     @value = array
   end
   
