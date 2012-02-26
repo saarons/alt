@@ -10,20 +10,10 @@ class Alt::Number < Alt::Value
     @value = Rational(value)
   end
   
-  method("+") do |receiver, arguments|
-    Alt::Number.new(receiver.value + arguments.first.value)
-  end
-
-  method("-") do |receiver, arguments|
-    Alt::Number.new(receiver.value - arguments.first.value)
-  end
-
-  method("*") do |receiver, arguments|
-    Alt::Number.new(receiver.value * arguments.first.value)
-  end
-
-  method("/") do |receiver, arguments|
-    Alt::Number.new(receiver.value / arguments.first.value)
+  ["+", "-", "*", "/"].each do |operator|
+    method(operator) do |receiver, arguments|
+      Alt::Number.new(receiver.value.send(operator, arguments.first.value))
+    end
   end
   
   method("^") do |receiver, arguments|
