@@ -16,6 +16,6 @@ class Alt::Runtime::Default < Alt::Runtime
   
   def evaluate(ast)
     main_function = Alt::Function.new(["arguments", "environment"], ast, false, context)
-    main_function.call([Alt::Value.from(@options[:args]), Alt::Value.from(@options[:env].to_hash)])
+    main_function.call([@options[:args].to_alt, @options[:env].to_hash.to_alt])
   end
 end

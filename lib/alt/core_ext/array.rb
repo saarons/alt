@@ -1,5 +1,6 @@
 # encoding: UTF-8
 
+require "alt/array"
 require "alt/booleans"
 
 class Array
@@ -9,5 +10,9 @@ class Array
       return_value = node.eval(context)
     end
     return_value || Alt::Nil.instance
+  end
+  
+  def to_alt
+    Alt::Array.new(self.map { |o| o.to_alt })
   end
 end
