@@ -20,7 +20,7 @@ module Alt::AST::PrecedenceTable
   op :right, "="
   op :left,  "||"
   op :left,  "&&"
-  op :none,  "==", "!="
+  op :none,  "==", "!=", "<=>"
   op :left,  "<", "<=", ">", ">="
   op :left,  "<<", ">>"
   op :left,  "+", "-"
