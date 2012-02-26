@@ -29,9 +29,11 @@ class Alt::Number < Alt::Value
   method("^") do |receiver, arguments|
     Alt::Number.new(receiver.value ** arguments.first.value)
   end
-  
-  method("<") do |receiver, arguments|
-    (receiver < arguments.first) ? Alt::True.instance : Alt::False.instance
+
+  ["<", "<=", ">", ">=", "==", "!=", "<=>"].each do |symbol|
+    method(symbol) do |receiver, arguments|
+      receiver.send(symbol, arguments.first).to_alt
+    end
   end
   
   method("abs") do |receiver, arguments|
