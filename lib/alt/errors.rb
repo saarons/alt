@@ -35,3 +35,9 @@ class Alt::UndefinedValue < Alt::RuntimeError
     "'#{@receiver.inspect}' does not respond to '#{@value}'"
   end
 end
+
+class Alt::UnexpectedBreak < Alt::RuntimeError  
+  def to_s
+    "Unexpected break"
+  end
+end
