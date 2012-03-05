@@ -26,7 +26,7 @@ class Alt::Function < Alt::Value
     end
   end
   
-  attribute("arity") do |receiver, *arguments|
+  attribute("arity") do |receiver|
     receiver.arguments.count.to_alt
   end
   
