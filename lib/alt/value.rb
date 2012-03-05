@@ -31,6 +31,10 @@ class Alt::Value
     end
   end
   
+  method("send") do |receiver, *arguments|
+    receiver[arguments.pop.value]
+  end
+  
   private
   def lookup(name)
     klass = self.class
