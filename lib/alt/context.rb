@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
-class Alt::Context  
+class Alt::Context
+  attr_reader :pure
   attr_accessor :expect_break
   
   def initialize(parent = nil, pure = false)

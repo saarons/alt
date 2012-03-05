@@ -13,6 +13,8 @@ class Alt::Function < Alt::Value
   end
 
   def call(context, *arguments)
+    raise Alt::ImpureFunctionCalled if context.pure && !@pure
+    
     new_context = Alt::Context.new(@context, @pure)
 
     @arguments.each_with_index do |param, index|
@@ -25,6 +27,6 @@ class Alt::Function < Alt::Value
   end
   
   def inspect
-    "(#{arguments.join(", ")})#{"!" unless @pure} { ... }"
+    "(#{@arguments.join(", ")})#{"!" unless @pure} { ... }"
   end
 end

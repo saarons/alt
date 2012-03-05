@@ -36,8 +36,14 @@ class Alt::UndefinedValue < Alt::RuntimeError
   end
 end
 
-class Alt::UnexpectedBreak < Alt::RuntimeError  
+class Alt::UnexpectedBreak < Alt::RuntimeError
   def to_s
     "Unexpected break"
+  end
+end
+
+class Alt::ImpureFunctionCalled < Alt::RuntimeError
+  def to_s
+    "Impure function called in a pure function"
   end
 end

@@ -9,6 +9,7 @@ class Alt::Method < Alt::Value
   end
   
   def call(context, *arguments)
+    raise Alt::ImpureFunctionCalled if context.pure && !@template.pure
     @template.block.call(@receiver, *arguments)
   end
   
@@ -18,7 +19,7 @@ class Alt::Method < Alt::Value
 end
 
 class Alt::MethodTemplate
-  attr_reader :block
+  attr_reader :block, :pure
   
   def initialize(name, pure, block)
     @name = name
