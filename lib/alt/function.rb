@@ -16,6 +16,8 @@ class Alt::Function < Alt::Value
   def call(context, *arguments)
     context.check_purity!(@pure)    
     new_context = Alt::Context.new(@context, @pure)
+    
+    new_context["self"] = self
 
     @arguments.each_with_index do |param, index|
       new_context[param] = arguments[index] || Alt::Nil.instance
