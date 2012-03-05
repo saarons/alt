@@ -3,7 +3,7 @@
 require "alt/embedded_function"
 
 class Alt::Context
-  attr_accessor :expect_break
+  attr_reader :expect_break
   
   def initialize(parent = nil, pure = false)
     @pure = pure
@@ -24,7 +24,7 @@ class Alt::Context
     end
   end
   
-  def give_me_a_break
+  def catch_break
     @expect_break = true
     yield self
     @expect_break = false
