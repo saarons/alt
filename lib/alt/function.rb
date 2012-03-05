@@ -4,6 +4,8 @@ require "alt/value"
 require "alt/booleans"
 
 class Alt::Function < Alt::Value
+  attr_reader :arguments
+  
   def initialize(arguments, expressions, pure, context)
     @pure = pure
     @context = context
@@ -22,6 +24,10 @@ class Alt::Function < Alt::Value
     catch :return do
       @expressions.eval(new_context)
     end
+  end
+  
+  attribute("arity") do |receiver, *arguments|
+    receiver.arguments.count.to_alt
   end
   
   def inspect

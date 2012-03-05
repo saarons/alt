@@ -12,6 +12,8 @@ class Alt::Value
       val.supply(self)
     when nil
       raise(Alt::UndefinedValue, [self, name])
+    when Proc
+      val.curry[self]
     else
       val
     end
@@ -20,6 +22,10 @@ class Alt::Value
   def self.method(name, pure = true, &block)
     require "alt/method"
     alt[name] = Alt::MethodTemplate.new(name, pure, block)
+  end
+  
+  def self.attribute(name, &block)
+    alt[name] = block
   end
   
   def to_boolean
