@@ -6,7 +6,7 @@ class Alt::Value
   end
   
   def [](name, *args)    
-    val = lookup(name)
+    val = self.class.lookup(name)
     case val
     when Alt::MethodTemplate
       val.supply(self)
@@ -50,9 +50,7 @@ class Alt::Value
   end
   
   private
-  def lookup(name)
-    klass = self.class
-    superklass = klass.superclass
-    klass.alt[name] || (superklass.respond_to?(:alt) ? superklass.alt[name] : nil)
+  def self.lookup(name)
+    alt[name] || (superclass.respond_to?(:lookup) ? superclass.lookup(name) : nil)
   end
 end
