@@ -1,7 +1,6 @@
 # encoding: UTF-8
 
-require "alt/array"
-require "alt/object"
+require "alt/number"
 require "alt/runtime"
 require "alt/function"
 
@@ -11,7 +10,12 @@ class Alt::Runtime::Default < Alt::Runtime
   end
   
   def cleanup(return_value)
-    exit(return_value.try(:value).try(:to_i) || true)
+    case return_value
+    when Alt::Number
+      exit(return_value.value.to_i)
+    else
+      exit
+    end
   end
   
   def evaluate(ast)
