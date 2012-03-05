@@ -7,23 +7,19 @@ class Alt::Value
   
   def [](name, *args)    
     val = lookup(name)
-    if name == "()"
-      self.call(args)
+    case val
+    when Alt::MethodTemplate
+      val.supply(self)
+    when nil
+      raise(Alt::UndefinedValue, [self, name])
     else
-      case val
-      when Alt::Method
-        val.curry(self)
-      when nil
-        raise(Alt::UndefinedValue, [self, name])
-      else
-        val
-      end
+      val
     end
   end
   
   def self.method(name, pure = true, &block)
     require "alt/method"
-    alt[name] = Alt::Method.new(name, pure, block)
+    alt[name] = Alt::MethodTemplate.new(name, pure, block)
   end
   
   def to_boolean

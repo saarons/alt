@@ -3,7 +3,22 @@
 require "alt/value"
 
 class Alt::Method < Alt::Value
-  attr_reader :pure
+  def initialize(receiver, template)
+    @receiver = receiver
+    @template = template
+  end
+  
+  def call(context, *arguments)
+    @template.block.call(@receiver, *arguments)
+  end
+  
+  def inspect
+    @template.inspect
+  end
+end
+
+class Alt::MethodTemplate
+  attr_reader :block
   
   def initialize(name, pure, block)
     @name = name
@@ -11,12 +26,8 @@ class Alt::Method < Alt::Value
     @block = block
   end
   
-  def call(arguments)
-    @block[arguments]
-  end
-  
-  def curry(receiver)
-    Alt::Method.new(@name, @pure, @block.curry[receiver])
+  def supply(receiver)
+    Alt::Method.new(receiver, self)
   end
   
   def inspect

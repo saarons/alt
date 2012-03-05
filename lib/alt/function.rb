@@ -5,8 +5,6 @@ require "alt/context"
 require "alt/booleans"
 
 class Alt::Function < Alt::Value
-  attr_reader :arguments, :expressions, :pure, :context
-
   def initialize(arguments, expressions, pure, context)
     @pure = pure
     @context = context
@@ -14,15 +12,15 @@ class Alt::Function < Alt::Value
     @expressions = expressions
   end
 
-  def call(arguments)
-    context = Alt::Context.new(@context, @pure)
+  def call(context, *arguments)
+    new_context = Alt::Context.new(@context, @pure)
 
     @arguments.each_with_index do |param, index|
-      context[param] = arguments[index] || Alt::Nil.instance
+      new_context[param] = arguments[index] || Alt::Nil.instance
     end
     
     catch :return do
-      @expressions.eval(context)
+      @expressions.eval(new_context)
     end
   end
   

@@ -29,6 +29,6 @@ class Alt::Context
   end
   
   DEFAULT = Alt::Context.new.tap do |c|
-    c["print"] = proc { |symbol, arguments| puts arguments.inspect; Alt::Nil.instance }
+    c["print"] = proc { |context, arguments| puts arguments.inspect; Alt::Nil.instance }
   end
 end

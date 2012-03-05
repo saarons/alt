@@ -4,6 +4,6 @@ require "alt/string"
 
 class Alt::AST::NumberLiteral
   def eval(context)
-    Alt::String.new(@number)["to_i"]["()"]
+    Alt::String.new(@number)["to_i"].call(context)
   end
 end
