@@ -14,7 +14,7 @@ class Alt::Function < Alt::Value
   end
 
   def call(context, *arguments)
-    context.try(:check_purity!, @pure)
+    context.check_purity!(@pure)
     new_context = Alt::Context.new(@context, @pure)
     
     new_context["self"] = self
