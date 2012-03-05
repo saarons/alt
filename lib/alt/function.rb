@@ -1,7 +1,6 @@
 # encoding: UTF-8
 
 require "alt/value"
-require "alt/context"
 require "alt/booleans"
 
 class Alt::Function < Alt::Value

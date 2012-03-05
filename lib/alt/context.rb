@@ -1,5 +1,7 @@
 # encoding: UTF-8
 
+require "alt/embedded_function"
+
 class Alt::Context
   attr_reader :pure
   attr_accessor :expect_break
@@ -30,6 +32,10 @@ class Alt::Context
   end
   
   DEFAULT = Alt::Context.new.tap do |c|
-    c["print"] = proc { |context, arguments| puts arguments.inspect; Alt::Nil.instance }
+    c["print"] = Alt::EmbeddedFunction.create(["object"]) do |context, arguments|
+      puts arguments.inspect
+      Alt::Nil.instance
+    end
+    
   end
 end
