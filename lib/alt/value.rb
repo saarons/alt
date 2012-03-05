@@ -41,6 +41,10 @@ class Alt::Value
     receiver[arguments.pop.value]
   end
   
+  def call(context, *arguments)
+    raise(Alt::UndefinedValue, [self, "()"])
+  end
+  
   private
   def lookup(name)
     klass = self.class
