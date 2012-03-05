@@ -135,7 +135,7 @@ array = "[" list?:l "]" { l || [] }
 function = ("(" argument_list:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
 return = "return" - value?:v ~return_statement(v)
 
-object = "{" sp-nl object_list:ol sp-nl "}" { ol }
+object = "{" sp-nl object_list?:ol sp-nl "}" { ol || {} }
 
 object_list = object_list:ol sp-nl "," sp-nl identifier:i ":" sp-nl value:v { ol.merge(Hash[i, v]) }
             | sp-nl string:s ":" sp-nl value:v { Hash[s, v] }
