@@ -1,7 +1,5 @@
 # encoding: UTF-8
 
-require "alt/value"
-
 class Alt::Method < Alt::Value
   def initialize(receiver, template)
     @receiver = receiver

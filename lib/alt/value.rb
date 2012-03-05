@@ -1,6 +1,8 @@
 # encoding: UTF-8
 
-class Alt::Value  
+class Alt::Value
+  require "alt/method"
+  
   def self.alt
     @alt ||= {}
   end
@@ -20,7 +22,6 @@ class Alt::Value
   end
   
   def self.method(name, pure = true, &block)
-    require "alt/method"
     alt[name] = Alt::MethodTemplate.new(name, pure, block)
   end
   
