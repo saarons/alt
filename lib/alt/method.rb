@@ -9,7 +9,7 @@ class Alt::Method < Alt::Value
   end
   
   def call(context, *arguments)
-    raise Alt::ImpureFunctionCalled if context.pure && !@template.pure
+    context.check_purity!(@template.pure)
     @template.block.call(@receiver, *arguments)
   end
   

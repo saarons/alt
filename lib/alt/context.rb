@@ -3,7 +3,6 @@
 require "alt/embedded_function"
 
 class Alt::Context
-  attr_reader :pure
   attr_accessor :expect_break
   
   def initialize(parent = nil, pure = false)
@@ -29,6 +28,10 @@ class Alt::Context
     @expect_break = true
     yield self
     @expect_break = false
+  end
+  
+  def check_purity!(input)
+    raise Alt::ImpureFunctionCalled if @pure && !input
   end
   
   DEFAULT = Alt::Context.new.tap do |c|

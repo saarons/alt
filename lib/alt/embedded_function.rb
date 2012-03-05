@@ -4,7 +4,7 @@ require "alt/function"
 
 class Alt::EmbeddedFunction < Alt::Function
   def call(context, *arguments)
-    raise Alt::ImpureFunctionCalled if context.pure && !@pure
+    context.check_purity!(@pure)
     @expressions.call(context, *arguments)
   end
   

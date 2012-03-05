@@ -12,8 +12,7 @@ class Alt::Function < Alt::Value
   end
 
   def call(context, *arguments)
-    raise Alt::ImpureFunctionCalled if context.pure && !@pure
-    
+    context.check_purity!(@pure)    
     new_context = Alt::Context.new(@context, @pure)
 
     @arguments.each_with_index do |param, index|
