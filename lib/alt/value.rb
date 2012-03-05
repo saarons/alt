@@ -45,6 +45,10 @@ class Alt::Value
     raise(Alt::UndefinedValue, [self, "()"])
   end
   
+  def to_alt
+    self
+  end
+  
   private
   def lookup(name)
     klass = self.class

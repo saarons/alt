@@ -18,6 +18,7 @@ class Alt::Function < Alt::Value
     new_context = Alt::Context.new(@context, @pure)
     
     new_context["self"] = self
+    new_context["arguments"] = arguments
 
     @arguments.each_with_index do |param, index|
       new_context[param] = arguments[index] || Alt::Nil.instance
@@ -30,6 +31,10 @@ class Alt::Function < Alt::Value
   
   attribute("arity") do |receiver|
     receiver.arguments.count.to_alt
+  end
+  
+  attribute("arguments") do |receiver|
+    receiver.arguments.to_alt
   end
   
   def inspect
