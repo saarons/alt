@@ -130,7 +130,7 @@ list = list:l - "," - value:v { l << v }
 argument_list = argument_list:al - "," - identifier:i { al << i }
               | identifier:i { [i] }
 
-array = "[" list?:l "]" { l }
+array = "[" list?:l "]" { l || [] }
 
 function = ("(" argument_list:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
 return = "return" - value?:v ~return_statement(v)
