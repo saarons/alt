@@ -17,11 +17,7 @@ class Alt::Context
   end
   
   def []=(name, value)
-    if @locals[name]
-      raise Alt::VariableReassignment, name
-    else
-      @locals[name] = value
-    end
+    @locals[name] = value
   end
   
   def catch_break
