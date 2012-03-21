@@ -137,7 +137,7 @@ return = "return" - value?:v ~return_statement(v)
 
 object = "{" sp-nl object_list?:ol sp-nl "}" { ol || {} }
 
-object_list = object_list:ol sp-nl "," sp-nl identifier:i ":" sp-nl value:v { ol.merge(Hash[i, v]) }
+object_list = object_list:ol sp-nl "," sp-nl string:s ":" sp-nl value:v { ol.merge(Hash[s, v]) }
             | sp-nl string:s ":" sp-nl value:v { Hash[s, v] }
             
 if = "if" sp-nl conditional_block:primary sp-nl elseif*:alternates sp-nl else?:fallback { if_statement(alternates.unshift(primary), fallback) }
