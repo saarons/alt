@@ -10,41 +10,24 @@ class Alt::Array < Alt::Value
   end
   
   method("concat") do |receiver, argument|
-    s1 = receiver.value
-    s2 = argument.value
-    s1.concat(s2)
+    receiver.value.dup.concat(argument.value)
   end
   
-  method("equals") do |receiver, argument|
-    s1 = receiver.value
-    s2 = argument.value
-    (s1 == s2).to_alt
+  method("==") do |receiver, argument|
+    receiver.value == argument.value
   end
   
-  method("pop") do |receiver|
-    s = receiver.value
-    if not s.empty?
-      s.pop()
-    else
-      "The array is empty."
+  ["push", "<<"].each do |x|
+    method(x) do |receiver, argument|
+      receiver.value.dup.push(argument)
     end
   end
   
-  method("push") do |receiver, argument|
-    arr = receiver.value
-    arr.push(argument)
-  end
-  
-  method("size") do |receiver|
-    s = receiver.value
-    s.size()
+  attribute("length") do |receiver|
+    receiver.value.length
   end
   
   def inspect
     "[" + @value.map(&:inspect).join(", ") + "]"
-  end
-  
-  attribute("length") do |receiver|
-    receiver.value.length.to_alt
   end
 end
