@@ -12,22 +12,22 @@ class Alt::Number < Alt::Value
   
   ["+", "-", "*", "/"].each do |operator|
     method(operator) do |receiver, argument|
-      Alt::Number.new(receiver.value.send(operator, argument.value))
+      receiver.value.send(operator, argument.value)
     end
   end
   
   method("^") do |receiver, argument|
-    Alt::Number.new(receiver.value ** argument.value)
+    receiver.value ** argument.value
   end
 
   ["<", "<=", ">", ">=", "==", "!=", "<=>"].each do |symbol|
     method(symbol) do |receiver, argument|
-      receiver.send(symbol, argument).to_alt
+      receiver.send(symbol, argument)
     end
   end
   
   method("abs") do |receiver|
-    Alt::Number.new(receiver.value.abs)
+    receiver.value.abs
   end
   
   def <=>(other)

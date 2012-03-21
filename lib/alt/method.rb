@@ -8,7 +8,7 @@ class Alt::Method < Alt::Value
   
   def call(context, *arguments)
     context.check_purity!(@template.pure)
-    @template.block.call(@receiver, *arguments)
+    @template.block.call(@receiver, *arguments).to_alt
   end
   
   def inspect
