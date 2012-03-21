@@ -9,10 +9,8 @@ class Alt::Object < Alt::Value
     @value = object
   end
   
-  method("equals") do |receiver, argument|
-    s1 = receiver.value
-    s2 = argument.value
-    (s1 == s2).to_alt
+  method("==") do |receiver, argument|
+    receiver.value == argument.value
   end
   
   method("fields") do |receiver|
@@ -46,14 +44,12 @@ class Alt::Object < Alt::Value
     @s1.delete(s2)
   end
   
-  method("size") do |receiver|
-    s = receiver.value
-    s.size()
+  attribute("size") do |receiver|
+    receiver.value.size
   end
   
-  method("values") do |receiver|
-    s = receiver.value
-    s.values
+  attribute("values") do |receiver|
+    receiver.value.values
   end
     
   def inspect

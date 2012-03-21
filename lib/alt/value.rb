@@ -15,7 +15,7 @@ class Alt::Value
     when nil
       raise(Alt::UndefinedValue, [self, name])
     when Proc
-      val.curry[self]
+      val.curry[self].to_alt
     else
       val
     end

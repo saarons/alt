@@ -17,6 +17,10 @@ class Alt::Array < Alt::Value
     receiver.value == argument.value
   end
   
+  method("[]") do |receiver, argument|
+    receiver.value[argument.value.to_i]
+  end
+  
   ["push", "<<"].each do |x|
     method(x) do |receiver, argument|
       receiver.value.dup.push(argument)
