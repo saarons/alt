@@ -6,4 +6,4 @@ fibonacci = (n) {
   }
 }
 
-print(arguments)
+print(fibonacci(20))
