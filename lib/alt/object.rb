@@ -33,9 +33,8 @@ class Alt::Object < Alt::Value
   method("put") do |receiver, argument1, argument2|
     s = receiver.value
     field = argument1.value
-    value = argument2.value
     if s.has_key?(field)
-      s[field] = value
+      s[field] = argument2
     else
       "The field given does not exist."
     end
