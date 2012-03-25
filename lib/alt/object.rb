@@ -51,6 +51,10 @@ class Alt::Object < Alt::Value
   attribute("values") do |receiver|
     receiver.value.values
   end
+  
+  attribute("method_missing") do |receiver, name, *arguments|
+    raise(Alt::UndefinedValue, [receiver, name]) # If the attribtue is not there
+  end
     
   def inspect
     "{#{@value.map { |k, v| k.inspect + ": " + v.inspect }.join(", ")}}"

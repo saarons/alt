@@ -13,9 +13,9 @@ class Alt::Value
     when Alt::MethodTemplate
       val.supply(self)
     when nil
-      raise(Alt::UndefinedValue, [self, name])
+      self["method_missing", name, *args]
     when Proc
-      val.curry[self].to_alt
+      val.curry[self, *args].to_alt
     else
       val
     end
@@ -40,6 +40,10 @@ class Alt::Value
   
   method("send") do |receiver, *arguments|
     receiver[arguments.pop.value]
+  end
+  
+  attribute("method_missing") do |receiver, name, *arguments|
+    raise(Alt::UndefinedValue, [receiver, name])
   end
   
   def call(context, *arguments)
