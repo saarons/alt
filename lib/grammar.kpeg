@@ -147,7 +147,7 @@ else = "else" sp-nl block:b { b }
 conditional_block = conditional:c sp-nl block:b { [c, b] }
 
 while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
-break = "break" ~break_statement
+break = /#{Alt::Grammar["break"]}/ ~break_statement
 
 call_operation = - < operators > - value2:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }
