@@ -45,10 +45,6 @@ def rpn(input)
   end
   results.first
 end
-
-def escape(text)
-  ESCAPE_SEQUENCES.reduce(text) { |text, (k, v)| text.gsub(k, v) }
-end
 }
 
 space = " "
@@ -62,9 +58,18 @@ number = < "-"? digit+ ("." digit+)? > { text }
 identifier = < char (char | digit)* > { text }
       
 quote = /#{QUOTE_REGEXP.source}/
-not_quote = /#{NOT_QUOTE.source}/
+not_quote = < /#{NOT_QUOTE.source}/ > { text }
 
-string = quote < (("\\" quote) | not_quote)* > quote { escape(text) }
+escaped_char = "\\n"  { "\n" }
+             | "\\b"  { "\b" }
+             | "\\f"  { "\f" }
+             | "\\r"  { "\r" }
+             | "\\t"  { "\t" }
+             | "\\\\" { "\\" }
+
+escaped_quote = < /#{ESCAPED_QUOTE.source}/ > { text.gsub("\\", "") }
+
+string = quote (escaped_quote | escaped_char | not_quote)*:chars quote { chars.join("") }
 
 - = space*
 sp-nl = (space | newline)*
