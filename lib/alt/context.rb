@@ -31,8 +31,8 @@ class Alt::Context
   end
   
   DEFAULT = Alt::Context.new.tap do |c|
-    c["print"] = Alt::EmbeddedFunction.create(["object"]) do |context, arguments|
-      puts arguments.inspect
+    c["print"] = Alt::EmbeddedFunction.create(["object"]) do |context, argument|
+      puts argument.value
       Alt::Nil.instance
     end
     
