@@ -69,7 +69,7 @@ escaped_char = "\\n"  { "\n" }
 
 escaped_quote = < /#{ESCAPED_QUOTE.source}/ > { text.gsub("\\", "") }
 
-string = quote (escaped_quote | escaped_char | not_quote)*:chars quote { chars.join("") }
+string = quote (escaped_quote | escaped_char | not_quote)*:chars quote { chars.join }
 
 - = space*
 sp-nl = (space | newline)*
