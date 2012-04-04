@@ -25,6 +25,9 @@ class Alt::String < Alt::Value
   end
   
   def inspect
-    '"' + @value.inspect[1..-2].gsub(Alt::Parser::QUOTE_REGEXP, '\\\\\0') + '"'
+    s = @value.inspect[1..-2]
+    s.gsub!(Alt::Parser::ESCAPED_QUOTE, '\\1')
+    s.gsub!(Alt::Parser::QUOTE_REGEXP, '\\\\\0')
+    "\"#{s}\""
   end
 end
