@@ -30,6 +30,10 @@ class Alt::Number < Alt::Value
     receiver.value.abs
   end
   
+  method("to_s") do |receiver|
+    receiver.inspect
+  end
+  
   def <=>(other)
     @value <=> other.value
   end
