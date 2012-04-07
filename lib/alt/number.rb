@@ -29,6 +29,24 @@ class Alt::Number < Alt::Value
   method("abs") do |receiver|
     receiver.value.abs
   end
+
+  method("绝对值") do |receiver|
+    receiver.value.abs
+  end
+  method("floor") do |receiver|
+    receiver.value.floor
+  end
+  method("ceil") do |receiver|
+	  receiver.value.ceil
+  end
+  method("denominator") do |receiver|
+	  receiver.value.denominator
+  end
+
+method("round") do |receiver|
+	receiver.value.round
+end
+
   
   def <=>(other)
     @value <=> other.value
