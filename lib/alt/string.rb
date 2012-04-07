@@ -14,7 +14,7 @@ class Alt::String < Alt::Value
     @value = value
   end
   
-  method("to_i") do |receiver, *arguments|
+  method("to_n") do |receiver, *arguments|
     s = receiver.value
     s = s.each_char.map { |c| FULLWIDTH_TO_ASCII.include?(c) ? FULLWIDTH_TO_ASCII[c] : c }.join
     Alt::Number.new(s)
@@ -25,6 +25,8 @@ class Alt::String < Alt::Value
   end
   
   def inspect
-    @value.inspect
+    s = @value.dup
+    s.gsub!(Alt::Parser::QUOTE_REGEXP, '\\\\\0')
+    "\"#{s}\""
   end
 end

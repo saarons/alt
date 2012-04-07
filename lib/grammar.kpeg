@@ -18,9 +18,6 @@
 %% nil_literal = ast NilLiteral
 
 %% {
-ESCAPED_QUOTE = Regexp.new("\\\\['\\\"\\p{Initial_Punctuation}\\p{Final_Punctuation}]")
-ESCAPE_SEQUENCES = Hash[[["\\n", "\n"], ["\\b", "\b"], ["\\f", "\f"], ["\\r", "\r"], ["\\t", "\t"], [ESCAPED_QUOTE, "\\0"], ["\\\\", "\\"]]]
-
 def shunting_yard(input)
   [].tap do |rpn|
     operator_stack = []
@@ -48,10 +45,6 @@ def rpn(input)
   end
   results.first
 end
-
-def escape(text)
-  ESCAPE_SEQUENCES.reduce(text) { |text, (k, v)| text.gsub(k, v) }
-end
 }
 
 space = " "
@@ -63,14 +56,20 @@ terminator = newline (space | newline)*
 
 number = < "-"? digit+ ("." digit+)? > { text }
 identifier = < char (char | digit)* > { text }
+      
+quote = /#{QUOTE_REGEXP.source}/
+not_quote = < /#{NOT_QUOTE.source}/ > { text }
 
-any_char = /[^'\"\p{Initial_Punctuation}\p{Final_Punctuation}]/
-quote = '"'
-      | "'"
-      | /\p{Final_Punctuation}/
-      | /\p{Initial_Punctuation}/
+escaped_char = "\\n"  { "\n" }
+             | "\\b"  { "\b" }
+             | "\\f"  { "\f" }
+             | "\\r"  { "\r" }
+             | "\\t"  { "\t" }
+             | "\\\\" { "\\" }
 
-string = quote < (("\\" quote) | any_char)* > quote { escape(text) }
+escaped_quote = < /#{ESCAPED_QUOTE.source}/ > { text.gsub("\\", "") }
+
+string = quote (escaped_quote | escaped_char | not_quote)*:chars quote { chars.join }
 
 - = space*
 sp-nl = (space | newline)*
@@ -147,7 +146,7 @@ else = "else" sp-nl block:b { b }
 conditional_block = conditional:c sp-nl block:b { [c, b] }
 
 while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
-break = "break" ~break_statement
+break = /#{Alt::Grammar["break"]}/ ~break_statement
 
 call_operation = - < operators > - value2:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }

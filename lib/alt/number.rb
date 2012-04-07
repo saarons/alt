@@ -48,6 +48,10 @@ method("round") do |receiver|
 end
 
   
+  method("to_s") do |receiver|
+    receiver.inspect
+  end
+  
   def <=>(other)
     @value <=> other.value
   end
