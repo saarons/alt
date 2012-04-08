@@ -14,6 +14,12 @@ class Alt::String < Alt::Value
     @value = value
   end
   
+  class << self
+    def name
+      "string"
+    end
+  end
+  
   method("to_n") do |receiver, *arguments|
     s = receiver.value
     s = s.each_char.map { |c| FULLWIDTH_TO_ASCII.include?(c) ? FULLWIDTH_TO_ASCII[c] : c }.join

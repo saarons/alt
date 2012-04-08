@@ -1,0 +1,4 @@
+methods:
+    number:
+        abs: "绝对值"
+        denominator: "分子"

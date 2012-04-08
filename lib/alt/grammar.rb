@@ -1,9 +1,15 @@
 # encoding: UTF-8
 
+require "alt/core_ext/nil_class"
+
 module Alt::Grammar
   class << self
     def keyword(kw)
-      grammar[current_language]["keywords"][kw]
+      grammar[current_language]["keywords"].try(:[], kw)
+    end
+    
+    def method(m, n)
+      grammar[current_language]["methods"].try(:[], m).try(:[], n)
     end
 
     def current_language

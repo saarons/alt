@@ -12,6 +12,12 @@ class Alt::Function < Alt::Value
     @arguments = arguments
     @expressions = expressions
   end
+  
+  class << self
+    def name
+      "function"
+    end
+  end
 
   def call(context, *arguments)
     context.check_purity!(@pure)

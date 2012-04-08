@@ -6,6 +6,12 @@ class Alt::Method < Alt::Value
     @template = template
   end
   
+  class << self
+    def name
+      "method"
+    end
+  end
+  
   def call(context, *arguments)
     context.check_purity!(@template.pure)
     @template.block.call(@receiver, *arguments).to_alt
