@@ -119,9 +119,9 @@ literal = string:s ~string_literal(s)
         | array:a ~array_literal(a)
         | object:o ~object_literal(o)
         | function
-        | "true" ~true_literal
-        | "false" ~false_literal
-        | "nil" ~nil_literal
+        | /#{Alt::Grammar.keyword("true")}/ ~true_literal
+        | /#{Alt::Grammar.keyword("false")}/ ~false_literal
+        | /#{Alt::Grammar.keyword("nil")}/ ~nil_literal
 
 list = list:l - "," - value:v { l << v }
      | value:v { [v] }
@@ -132,21 +132,21 @@ argument_list = argument_list:al - "," - identifier:i { al << i }
 array = "[" list?:l "]" { l || [] }
 
 function = ("(" argument_list:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
-return = "return" - value?:v ~return_statement(v)
+return = /#{Alt::Grammar.keyword("return")}/ - value?:v ~return_statement(v)
 
 object = "{" sp-nl object_list?:ol sp-nl "}" { ol || {} }
 
 object_list = object_list:ol sp-nl "," sp-nl string:s ":" sp-nl value:v { ol.merge(Hash[string_literal(s), v]) }
             | sp-nl string:s ":" sp-nl value:v { Hash[string_literal(s), v] }
             
-if = "if" sp-nl conditional_block:primary sp-nl elseif*:alternates sp-nl else?:fallback { if_statement(alternates.unshift(primary), fallback) }
-elseif = "elseif" sp-nl conditional_block:cb sp-nl { cb }
-else = "else" sp-nl block:b { b }
+if = /#{Alt::Grammar.keyword("if")}/ sp-nl conditional_block:primary sp-nl elseif*:alternates sp-nl else?:fallback { if_statement(alternates.unshift(primary), fallback) }
+elseif = /#{Alt::Grammar.keyword("elseif")}/ sp-nl conditional_block:cb sp-nl { cb }
+else = /#{Alt::Grammar.keyword("else")}/ sp-nl block:b { b }
 
 conditional_block = conditional:c sp-nl block:b { [c, b] }
 
-while = "while" sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
-break = /#{Alt::Grammar["break"]}/ ~break_statement
+while = /#{Alt::Grammar.keyword("while")}/ sp-nl conditional:c sp-nl block:b ~while_statement(c, b)
+break = /#{Alt::Grammar.keyword("break")}/ ~break_statement
 
 call_operation = - < operators > - value2:v { [text, v] }
                | array:a { ["[]", method_call(nil, "[]", a)] }

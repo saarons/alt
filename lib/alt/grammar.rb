@@ -1,14 +1,31 @@
+# encoding: UTF-8
+
 module Alt::Grammar
-  def self.[](name)
-    grammar[name]
-  end
-  
-  private
-  def self.grammar
-    @grammar ||= load_grammar
-  end
-  
-  def self.load_grammar
-    {"break" => "break"}
+  class << self
+    def keyword(kw)
+      grammar[current_language]["keywords"][kw]
+    end
+
+    def current_language
+      @language ||= "en"
+    end
+    
+    def current_language=(language)
+      @language = language
+    end
+
+    private
+    def grammar
+      @grammar ||= load_grammar
+    end
+
+    def load_grammar
+      {}.tap do |languages|
+        Dir.glob(File.expand_path("../../../etc/*.yml", __FILE__)) do |filename|
+          language = File.basename(filename, ".yml")
+          languages[language] = YAML.load_file(filename)
+        end
+      end
+    end
   end
 end
