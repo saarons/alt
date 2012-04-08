@@ -32,49 +32,18 @@ class Alt::Number < Alt::Value
 		end
 	end
 	
-	method("sqrt") do |receiver|
-		Math.sqrt(receiver.value.to_f).to_r
+	["sqrt", "sin", "cos", "tan", "log10", "log2"].each do |operation|
+	  method(operation) do |receiver|
+  		Math.send(operation, receiver.value)
+  	end
 	end
 	
-	method("sin") do |receiver|
-		Math.sin(receiver.value.to_f).to_r
-	end
-	
-	method("cos") do |receiver|
-		Math.cos(receiver.value.to_f).to_r
-	end
-	
-	method("tan") do |receiver|
-		Math.tan(receiver.value.to_f).to_r
-	end
-	
-	method("log10") do |receiver|
-		Math.log10(receiver.value.to_f).to_r
-	end
-	
-	method("log2") do |receiver|
-		Math.log2(receiver.value.to_f).to_r
+	["abs", "floor", "ceil", "numerator", "denominator", "round"].each do |unary|
+	  method(unary) do |receiver|
+  		receiver.value.send(unary)
+  	end
 	end
 
-	method("abs") do |receiver|
-		receiver.value.abs
-	end
-
-	method("floor") do |receiver|
-		receiver.value.floor
-	end
-	
-	method("ceil") do |receiver|
-		receiver.value.ceil
-	end
-	
-	method("denominator") do |receiver|
-		receiver.value.denominator
-	end
-
-	method("round") do |receiver|
-		receiver.value.round
-	end
 	method("showfloat") do |receiver|
 		receiver.value.to_f.to_s
 	end
