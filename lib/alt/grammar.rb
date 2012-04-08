@@ -1,5 +1,6 @@
 # encoding: UTF-8
 
+require "alt/core_ext/object"
 require "alt/core_ext/nil_class"
 
 module Alt::Grammar
@@ -13,7 +14,7 @@ module Alt::Grammar
     end
 
     def current_language
-      @language ||= "en"
+      @language ||= (ENV["ALT_LANG"] || "en")
     end
     
     def current_language=(language)

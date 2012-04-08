@@ -1,4 +1,16 @@
+---
 methods:
     number:
         abs: "绝对值"
         denominator: "分子"
+
+keywords:
+    "if": "if"
+    "elseif": "elseif"
+    "else": "else"
+    "while": "while"
+    "break": "break"
+    "return": "return"
+    "true": "true"
+    "false": "false"
+    "nil": "nil"

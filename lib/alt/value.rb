@@ -24,7 +24,7 @@ class Alt::Value
   def self.method(name, pure = true, &block)
     require "alt/grammar"
     
-    if aliased_method = Alt::Grammar.method(name, self.name)
+    if aliased_method = Alt::Grammar.method(self.name, name)
       alt[aliased_method] = Alt::MethodTemplate.new(aliased_method, pure, block)
     end
     
