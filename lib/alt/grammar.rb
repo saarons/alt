@@ -12,6 +12,10 @@ module Alt::Grammar
     def method(m, n)
       grammar[current_language]["methods"].try(:[], m).try(:[], n)
     end
+    
+    def attribute(a, n)
+      grammar[current_language]["attributes"].try(:[], a).try(:[], n)
+    end
 
     def current_language
       @language ||= (ENV["ALT_LANG"] || "en")
