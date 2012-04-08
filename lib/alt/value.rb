@@ -13,19 +13,29 @@ class Alt::Value
     when Alt::MethodTemplate
       val.supply(self)
     when nil
-      raise(Alt::UndefinedValue, [self, name])
+      self["method_missing", name, *args]
     when Proc
-      val.curry[self]
+      val.curry[self, *args].to_alt
     else
       val
     end
   end
   
   def self.method(name, pure = true, &block)
+    require "alt/grammar"
+    
+    if aliased_method = Alt::Grammar.method(self.name, name)
+      name = aliased_method
+    end
+    
     alt[name] = Alt::MethodTemplate.new(name, pure, block)
   end
   
   def self.attribute(name, &block)
+    if aliased_attribute = Alt::Grammar.attribute(self.name, name)
+      name = aliased_attribute
+    end
+    
     alt[name] = block
   end
   
@@ -40,6 +50,10 @@ class Alt::Value
   
   method("send") do |receiver, *arguments|
     receiver[arguments.pop.value]
+  end
+  
+  attribute("method_missing") do |receiver, name, *arguments|
+    raise(Alt::UndefinedValue, [receiver, name])
   end
   
   def call(context, *arguments)

@@ -25,6 +25,8 @@ class Alt::AST::Operator
       Alt::AST::AndOperator.new(lhs, rhs)
     when "||"
       Alt::AST::OrOperator.new(lhs, rhs)
+    when "[]"
+      Alt::AST::MethodCall.new(Alt::AST::MethodCall.new(lhs, @symbol, nil), "()", rhs.arguments)
     else
       Alt::AST::MethodCall.new(Alt::AST::MethodCall.new(lhs, @symbol, nil), "()", Array(rhs))
     end

@@ -4,6 +4,8 @@ require "alt/value"
 require "alt/number"
 
 class Alt::String < Alt::Value
+  include Comparable
+  
   FULLWIDTH_TO_ASCII = Hash[(0xFF10..0xFF19).map { |c| [c].pack("U*") }.zip("0".."9")]
   
   attr_reader :value
@@ -12,7 +14,13 @@ class Alt::String < Alt::Value
     @value = value
   end
   
-  method("to_i") do |receiver, *arguments|
+  class << self
+    def name
+      "string"
+    end
+  end
+  
+  method("to_n") do |receiver, *arguments|
     s = receiver.value
     s = s.each_char.map { |c| FULLWIDTH_TO_ASCII.include?(c) ? FULLWIDTH_TO_ASCII[c] : c }.join
     Alt::Number.new(s)
@@ -40,7 +48,15 @@ class Alt::String < Alt::Value
     Alt::String.new(s[arg_1,arg_2])
   end
 
+
+  def <=>(other)
+    @value <=> other.value
+  end
+  
+
   def inspect
-    @value.inspect
+    s = @value.dup
+    s.gsub!(Alt::Parser::QUOTE_REGEXP, '\\\\\0')
+    "\"#{s}\""
   end
 end

@@ -3,6 +3,8 @@
 require "bundler/setup"
 require "kpeg"
 
+require "alt/parser"
+
 begin
   require "grammar.kpeg.rb"
 rescue LoadError

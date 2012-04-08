@@ -9,11 +9,35 @@ class Alt::Array < Alt::Value
     @value = array
   end
   
-  def inspect
-    "[" + @value.map(&:inspect).join(", ") + "]"
+  class << self
+    def name
+      "array"
+    end
+  end
+  
+  method("concat") do |receiver, argument|
+    receiver.value.dup.concat(argument.value)
+  end
+  
+  method("==") do |receiver, argument|
+    receiver.value == argument.value
+  end
+  
+  method("[]") do |receiver, argument|
+    receiver.value[argument.value.to_i]
+  end
+  
+  ["push", "<<"].each do |x|
+    method(x) do |receiver, argument|
+      receiver.value.dup.push(argument)
+    end
   end
   
   attribute("length") do |receiver|
-    receiver.value.length.to_alt
+    receiver.value.length
+  end
+  
+  def inspect
+    "[" + @value.map(&:inspect).join(", ") + "]"
   end
 end
