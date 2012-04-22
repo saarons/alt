@@ -9,6 +9,12 @@ class Alt::Array < Alt::Value
     @value = array
   end
   
+  class << self
+    def name
+      "array"
+    end
+  end
+  
   method("concat") do |receiver, argument|
     receiver.value.dup.concat(argument.value)
   end

@@ -11,7 +11,7 @@ stty_save = `stty -g`.chomp
 trap("INT") { system "stty", stty_save; exit }
 
 if file = ARGV.first
-  Alt.ast(File.read(file))
+  pp Alt.ast(File.read(file))
 else
   puts "alt #{Alt::VERSION}"
   while line = Readline::readline(">> ", true)

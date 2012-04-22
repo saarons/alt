@@ -8,6 +8,12 @@ class Alt::EmbeddedFunction < Alt::Function
     @expressions.call(context, *arguments)
   end
   
+  class << self
+    def name
+      "embedded_function"
+    end
+  end
+  
   def self.create(arguments, pure = true, &block)
     Alt::EmbeddedFunction.new(arguments, block, pure, nil)
   end

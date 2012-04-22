@@ -9,6 +9,12 @@ class Alt::Object < Alt::Value
     @value = object
   end
   
+  class << self
+    def name
+      "object"
+    end
+  end
+  
   method("==") do |receiver, argument|
     receiver.value == argument.value
   end

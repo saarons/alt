@@ -1,0 +1,11 @@
+---
+keywords:
+    "if": "if"
+    "elseif": "elseif"
+    "else": "else"
+    "while": "while"
+    "break": "break"
+    "return": "return"
+    "true": "true"
+    "false": "false"
+    "nil": "nil"

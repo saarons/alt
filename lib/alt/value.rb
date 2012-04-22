@@ -22,10 +22,20 @@ class Alt::Value
   end
   
   def self.method(name, pure = true, &block)
+    require "alt/grammar"
+    
+    if aliased_method = Alt::Grammar.method(self.name, name)
+      name = aliased_method
+    end
+    
     alt[name] = Alt::MethodTemplate.new(name, pure, block)
   end
   
   def self.attribute(name, &block)
+    if aliased_attribute = Alt::Grammar.attribute(self.name, name)
+      name = aliased_attribute
+    end
+    
     alt[name] = block
   end
   

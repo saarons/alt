@@ -3,6 +3,21 @@
 
 $:.unshift(File.expand_path("../../lib", __FILE__))
 
+require "optparse"
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: alt [options] <file>"
+
+  opts.on("-l", "--language [LANG]") do |l|
+    options[:language] = l
+  end
+end.parse!
+
+if lang = options[:language]
+  ENV["ALT_LANG"] = lang
+end
+
 require "alt"
 
 stty_save = `stty -g`.chomp
