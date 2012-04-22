@@ -27,4 +27,12 @@ class Alt::String < Alt::Value
   def inspect
     @value.inspect
   end
+  
+  def eql?(other)
+    @value.eql?(other.value)
+  end
+  
+  def hash
+    @value.hash
+  end
 end

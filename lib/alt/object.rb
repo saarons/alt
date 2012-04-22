@@ -13,39 +13,28 @@ class Alt::Object < Alt::Value
     receiver.value == argument.value
   end
   
-  method("fields") do |receiver|
-    s = receiver.value
-    s.keys
-  end
-  
-  method("hasField") do |receiver, argument|
-    @s = receiver.value
-    field = argument.value
-    if @s.has_key?(field)
-      true
-    else
-      false
-    end
+  method("has_field") do |receiver, argument|
+    receiver.value.keys.include?(argument)
   end
   
   method("put") do |receiver, argument1, argument2|
-    s = receiver.value
-    field = argument1.value
-    if s.has_key?(field)
-      s[field] = argument2
+    if receiver.value.keys.include?(argument1)
+      receiver.value[argument1] = argument2
     else
       "The field given does not exist."
     end
   end
   
   method("remove") do |receiver, argument|
-    @s1 = receiver.value
-    s2 = argument.value
-    @s1.delete(s2)
+    receiver.value.delete(argument)
   end
   
   attribute("size") do |receiver|
     receiver.value.size
+  end
+  
+  attribute("fields") do |receiver|
+    receiver.value.keys
   end
   
   attribute("values") do |receiver|
@@ -53,7 +42,7 @@ class Alt::Object < Alt::Value
   end
   
   attribute("method_missing") do |receiver, name, *arguments|
-    raise(Alt::UndefinedValue, [receiver, name]) # If the attribtue is not there
+    raise(Alt::UndefinedValue, [receiver, name]) # If the attribute is not there
   end
     
   def inspect
