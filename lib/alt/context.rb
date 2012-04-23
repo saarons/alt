@@ -1,5 +1,8 @@
 # encoding: UTF-8
 
+require "alt/core_ext/hash"
+require "alt/core_ext/float"
+require "alt/core_ext/string"
 require "alt/embedded_function"
 
 class Alt::Context
@@ -35,6 +38,8 @@ class Alt::Context
       puts argument.value
       Alt::Nil.instance
     end
+    
+    c["Math"] = {"PI" => Math::PI}.to_alt
     
   end
 end
