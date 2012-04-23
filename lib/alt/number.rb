@@ -4,7 +4,6 @@ require "alt/value"
 
 class Alt::Number < Alt::Value
 	include Comparable
-	attr_reader :value
 
 	def initialize(value)
 		@value = Rational(value)

@@ -8,8 +8,6 @@ class Alt::String < Alt::Value
 
 	FULLWIDTH_TO_ASCII = Hash[(0xFF10..0xFF19).map { |c| [c].pack("U*") }.zip("0".."9")]
 
-	attr_reader :value
-
 	def initialize(value)
 		@value = value
 	end
@@ -78,14 +76,6 @@ class Alt::String < Alt::Value
 	def <=>(other)
 		@value <=> other.value
 	end
-	
-	def eql?(other)
-	  @value.eql?(other.value)
-	end
-
-  def hash
-    @value.hash
-  end
 
 	def inspect
 		s = @value.dup

@@ -2,9 +2,7 @@
 
 require "alt/value"
 
-class Alt::Array < Alt::Value
-  attr_reader :value
-  
+class Alt::Array < Alt::Value  
   def initialize(array = [])
     @value = array
   end

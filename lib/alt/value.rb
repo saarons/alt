@@ -2,6 +2,7 @@
 
 class Alt::Value
   require "alt/method"
+  attr_reader :value
   
   def self.alt
     @alt ||= {}
@@ -62,6 +63,14 @@ class Alt::Value
   
   def to_alt
     self
+  end
+  
+  def eql?(other)
+	  @value.eql?(other.value)
+	end
+
+  def hash
+    @value.hash
   end
   
   private

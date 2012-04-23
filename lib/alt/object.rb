@@ -2,9 +2,7 @@
 
 require "alt/value"
 
-class Alt::Object < Alt::Value
-  attr_reader :value
-  
+class Alt::Object < Alt::Value  
   def initialize(object = {})
     @value = object
   end
