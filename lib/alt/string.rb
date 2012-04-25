@@ -61,6 +61,18 @@ class Alt::String < Alt::Value
 	method("reverse") do |receiver, argument|
 		receiver.value.reverse
 	end
+	method("lstrip") do |receiver, argument|
+		receiver.value.lstrip
+	end
+	method("succ") do  |receiver,argument|
+		receiver.value.succ
+	end
+	method("split") do|receiver,argument|
+		receiver.value.split
+	end
+	method("swapcase") do |receiver|
+		receiver.value.swapcase
+	end
 
 
 
