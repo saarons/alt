@@ -49,6 +49,20 @@ class Alt::String < Alt::Value
 	method("delete") do |receiver, argument|
 		receiver.value.delete argument.value
 	end
+	method("isempty") do |receiver, argument|
+		receiver.value.empty?
+	end
+	method("isinclude") do |receiver, argument|
+		receiver.value.include? argument.value
+	end
+	method("index") do |receiver, argument|
+		receiver.value.index(argument.value)
+	end
+	method("reverse") do |receiver, argument|
+		receiver.value.reverse
+	end
+
+
 
 	method("length") do |receiver, *arguments|
 		s = receiver.value
@@ -70,6 +84,9 @@ class Alt::String < Alt::Value
 		arg_1 = arguments[0].value
 		arg_2 = arguments[1].value  
 		Alt::String.new(s[arg_1,arg_2])
+	end
+	method("insert") do |receiver, *arguments|
+		receiver.value.insert(arguments[0].value, arguments[1].value)
 	end
 
 
