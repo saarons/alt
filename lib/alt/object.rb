@@ -22,31 +22,33 @@ class Alt::Object < Alt::Value
   end
   
   method("put") do |receiver, argument1, argument2|
-    if receiver.value.keys.include?(argument1)
-      receiver.value[argument1] = argument2
-    else
-      "The field given does not exist."
-    end
+    receiver.value[argument1] = argument2
   end
   
   method("remove") do |receiver, argument|
     receiver.value.delete(argument)
   end
   
-  attribute("size") do |receiver|
+  method("size") do |receiver|
     receiver.value.size
   end
   
-  attribute("fields") do |receiver|
+  method("fields") do |receiver|
     receiver.value.keys
   end
   
-  attribute("values") do |receiver|
+  method("values") do |receiver|
     receiver.value.values
   end
   
   attribute("method_missing") do |receiver, name, *arguments|
-    raise(Alt::UndefinedValue, [receiver, name]) # If the attribute is not there
+    field = Alt::String.new(name)
+    if receiver.value.keys.include?(field)
+      receiver.value[field]
+    else
+      puts "Field \"" + name + "\" does not exist."
+      # raise(Alt::UndefinedValue, [receiver, name]) # If the attribute is not there
+    end
   end
     
   def inspect
