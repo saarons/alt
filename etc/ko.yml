@@ -1,0 +1,15 @@
+---
+methods:
+    number:
+        abs: "절대값"
+
+keywords:
+    "if": "진실이면"
+    "elseif": "않으면이거진실이면"
+    "else": "않으면"
+    "while": "동안"
+    "break": "깨다"
+    "return": "돌아주다"
+    "true": "진실"
+    "false": "거짓"
+    "nil": "무"
