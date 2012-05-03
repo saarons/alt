@@ -1,0 +1,16 @@
+---
+methods:
+    number:
+        abs: "绝对值"
+        denominator: "分子"
+
+keywords:
+    "if": "もし"
+    "elseif": "エルスイフ"
+    "else": "エルス"
+    "while": "ウワアイル"
+    "break": "ブレイク"
+    "return": "リターン"
+    "true": "トウルー"
+    "false": "false"
+    "nil": "nil"
