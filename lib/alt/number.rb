@@ -15,7 +15,7 @@ class Alt::Number < Alt::Value
     end
   end
 
-	["+", "-", "*", "/"].each do |operator|
+	["+", "-", "*", "/", "%"].each do |operator|
 		method(operator) do |receiver, argument|
 			receiver.value.send(operator, argument.value)
 		end

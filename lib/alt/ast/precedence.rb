@@ -24,7 +24,7 @@ module Alt::AST::PrecedenceTable
   op :left,  "<", "<=", ">", ">="
   op :left,  "<<", ">>"
   op :left,  "+", "-"
-  op :left,  "*", "/"
+  op :left,  "*", "/", "%"
   op :right, "^"
   op :left,  ".", "[]", "()"
 end
