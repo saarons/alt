@@ -26,8 +26,10 @@ class Alt::Function < Alt::Value
     new_context["self"] = self
     new_context["arguments"] = arguments
 
-    @arguments.each_with_index do |param, index|
-      new_context[param] = arguments[index] || Alt::Nil.instance
+    if @arguments
+      @arguments.each_with_index do |param, index|
+        new_context[param] = arguments[index] || Alt::Nil.instance
+      end
     end
     
     catch :return do
@@ -44,6 +46,6 @@ class Alt::Function < Alt::Value
   end
   
   def inspect
-    "(#{@arguments.join(", ")})#{"!" unless @pure} { ... }"
+    "(#{@arguments.try(:join, ", ")})#{"!" unless @pure} { ... }"
   end
 end

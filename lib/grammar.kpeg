@@ -132,7 +132,7 @@ argument_list = argument_list:al - "," - identifier:i { al << i }
 
 array = "[" list?:l "]" { l || [] }
 
-function = ("(" argument_list:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
+function = ("(" argument_list?:al ")")? < "!"? > sp-nl block:b ~function_literal(al, b, text != "!")
 return = /#{Alt::Grammar.keyword("return")}/ - value?:v ~return_statement(v)
 
 object = "{" sp-nl object_list?:ol sp-nl "}" { ol || {} }
